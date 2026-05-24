@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ankita Cable Network</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap');
+:root{--bg:#f4efe6;--ink:#111318;--card:#fdfaf4;--border:#ddd5c0;--accent:#c94800;--muted:#7a7060;--green:#1a6e40;--green-bg:#e8f5ee;--red-bg:#fdecea;--red:#a80000;--header:#141920;--nav:#1c2330}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px}
+header{background:var(--header);padding:1rem 1.5rem;border-bottom:3px solid var(--accent);display:flex;align-items:center;gap:1rem}
+.logo{width:38px;height:38px;background:var(--accent);border-radius:6px;display:grid;place-items:center;font-family:'Teko',sans-serif;font-size:1.25rem;color:#fff;flex-shrink:0}
+header h1{font-family:'Teko',sans-serif;font-size:1.55rem;color:#fff;letter-spacing:.05em;line-height:1}
+header p{font-size:.72rem;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+nav{background:var(--nav);display:flex;padding:.5rem 1.5rem;gap:4px;flex-wrap:wrap}
+nav button{font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;padding:.42rem 1rem;border:none;border-radius:4px;background:transparent;color:#8a93a6;cursor:pointer;transition:background .15s,color .15s}
+nav button.active{background:var(--accent);color:#fff}
+nav button:not(.active):hover{background:rgba(255,255,255,.07);color:#ccc}
+.page{display:none;padding:1.25rem 1rem 3rem;max-width:580px;margin:0 auto}
+.page.on{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.1rem 1.2rem;margin-bottom:1rem}
+.ch{font-family:'Teko',sans-serif;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.85rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.field{margin-bottom:.85rem}
+label{display:block;font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.28rem}
+input,select{width:100%;padding:.6rem .75rem;border:1.5px solid var(--border);border-radius:5px;font-family:'DM Sans',sans-serif;font-size:1rem;background:#fff;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,72,0,.1)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.btn{font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;padding:.62rem 1.2rem;border:none;border-radius:5px;cursor:pointer;transition:opacity .15s,transform .1s;display:inline-flex;align-items:center;gap:.4rem;margin-top:.1rem}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-p{background:var(--accent);color:#fff}
+.btn-p:not(:disabled):hover{opacity:.88}
+.btn-g{background:transparent;border:1.5px solid var(--border);color:var(--ink);font-size:.82rem;padding:.38rem .8rem;margin-top:0}
+.btn-g:hover{border-color:var(--accent);color:var(--accent)}
+.srow{display:flex;gap:.5rem}
+.srow input{flex:1}
+#cust{display:none}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem;margin-bottom:.9rem}
+.inf label{margin-bottom:.1rem}
+.inf p{font-size:1rem;font-weight:600}
+hr{border:none;border-top:1px solid var(--border);margin:.85rem 0}
+.msg{font-size:.83rem;padding:.45rem .75rem;border-radius:5px;margin-top:.6rem;display:none}
+.msg.ok{background:var(--green-bg);color:var(--green);display:block}
+.msg.err{background:var(--red-bg);color:var(--red);display:block}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;text-align:center}
+.sn{font-family:'Teko',sans-serif;font-size:1.8rem;line-height:1;color:var(--accent)}
+.sl{font-size:.68rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+#records-page .card{padding:0;overflow:hidden}
+.thead{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.2rem;border-bottom:1px solid var(--border);gap:.5rem;flex-wrap:wrap}
+.thead h2{font-family:'Teko',sans-serif;font-size:1.1rem;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+#tsearch{max-width:180px;font-size:.85rem;padding:.38rem .65rem}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{background:#f0ebe0;font-size:.7rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:.55rem .85rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:.6rem .85rem;border-bottom:1px solid #ede8dc;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#faf5ec}
+.badge{font-size:.7rem;font-weight:600;padding:.18rem .5rem;border-radius:99px;background:var(--green-bg);color:var(--green)}
+.er td{text-align:center;color:var(--muted);font-style:italic;padding:2rem}
+.xb{background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem;padding:.2rem .3rem;border-radius:3px;transition:color .15s,background .15s}
+.xb:hover{color:var(--red);background:var(--red-bg)}
+.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(max-width:480px){
+  .two{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .stats .stat:last-child{grid-column:1/-1}
+  header h1{font-size:1.25rem}
+  #tsearch{max-width:120px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">A</div>
+  <div>
+    <h1>Ankita Cable Network</h1>
+    <p>Customer Management</p>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="goNav('search',this)">Search &amp; Recharge</button>
+  <button onclick="goNav('reg',this)">New Registration</button>
+  <button onclick="goNav('records',this)">All Records</button>
+</nav>
+
+<!-- SEARCH -->
+<div id="search-page" class="page on">
+  <div class="card">
+    <div class="ch">Find Customer</div>
+    <div class="field">
+      <label>Phone or Box Number</label>
+      <div class="srow">
+        <input id="q" placeholder="e.g. 9876543210 or BOX001" onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="btn btn-p" id="fb" onclick="doSearch()">Fetch</button>
+      </div>
+    </div>
+    <div id="fm" class="msg"></div>
+  </div>
+
+  <div id="cust">
+    <div class="card">
+      <div class="ch">Customer Details</div>
+      <div class="igrid">
+        <div class="inf"><label>Name</label><p id="cn">—</p></div>
+        <div class="inf"><label>Box Number</label><p id="cb">—</p></div>
+        <div class="inf"><label>Phone</label><p id="cp">—</p></div>
+        <div class="inf"><label>Last Recharge</label><p id="ca">—</p></div>
+        <div class="inf"><label>Last Date</label><p id="cd">—</p></div>
+        <div class="inf"><label>Registered</label><p id="cr">—</p></div>
+      </div>
+      <hr>
+      <div class="ch" style="border:none;padding:0;margin-bottom:.75rem">New Recharge</div>
+      <div class="two">
+        <div class="field"><label>Amount (₹)</label><input id="ra" type="number" min="1" placeholder="300"></div>
+        <div class="field"><label>Months</label><select id="rm"></select></div>
+      </div>
+      <button class="btn btn-p" id="rb" onclick="doRecharge()">Submit Recharge</button>
+      <div id="rrm" class="msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="reg-page" class="page">
+  <div class="card">
+    <div class="ch">Register New Customer</div>
+    <div class="field"><label>Full Name</label><input id="rn" placeholder="Customer full name"></div>
+    <div class="two">
+      <div class="field"><label>Phone</label><input id="rph" type="tel" placeholder="10-digit number"></div>
+      <div class="field"><label>Box Number</label><input id="rbx" placeholder="e.g. BOX001"></div>
+    </div>
+    <div class="field"><label>Initial Recharge (₹)</label><input id="ramt" type="number" min="0" placeholder="500"></div>
+    <button class="btn btn-p" id="rgbtn" onclick="doRegister()">Register Customer</button>
+    <div id="rgm" class="msg"></div>
+  </div>
+</div>
+
+<!-- RECORDS -->
+<div id="records-page" class="page">
+  <div class="stats" id="statsbar"></div>
+  <div class="card">
+    <div class="thead">
+      <h2>All Customers</h2>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <input id="tsearch" placeholder="Search…" oninput="renderTable()">
+        <button class="btn btn-g" onclick="exportCSV()">Export CSV</button>
+      </div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Box</th><th>Last ₹</th><th>Date</th><th></th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = 'acn_db';
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY)||'[]'); } catch { return []; } };
+const save = d => localStorage.setItem(KEY, JSON.stringify(d));
+const $    = id => document.getElementById(id);
+const today= () => new Date().toLocaleDateString('en-IN');
+const esc  = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function setMsg(id,t,ok){ const e=$(id); e.className='msg '+(ok?'ok':'err'); e.textContent=t; }
+function clrMsg(id){ const e=$(id); e.className='msg'; e.textContent=''; }
+function busy(b,on){ b.disabled=on; if(on){b._t=b.innerHTML;b.innerHTML='<span class="spin"></span>';} else b.innerHTML=b._t; }
+
+// months
+(()=>{ const s=$('rm'); for(let i=1;i<=12;i++) s.add(new Option(i+' Month'+(i>1?'s':''),i)); })();
+
+function goNav(p,btn){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  $(p+'-page').classList.add('on');
+  btn.classList.add('active');
+  if(p==='records'){ renderStats(); renderTable(); }
+}
+
+let curBox='';
+
+function doSearch(){
+  const q=$('q').value.trim().toLowerCase();
+  if(!q) return setMsg('fm','Enter a phone number or box number.',false);
+  clrMsg('fm'); $('cust').style.display='none';
+  const b=$('fb'); busy(b,true);
+  setTimeout(()=>{
+    const row=load().find(r=>String(r.phone).toLowerCase()===q||String(r.box).toLowerCase()===q);
+    busy(b,false);
+    if(!row) return setMsg('fm','Customer not found.',false);
+    $('cn').textContent=row.name; $('cb').textContent=row.box;
+    $('cp').textContent=row.phone; $('ca').textContent=row.lastAmt?'₹'+row.lastAmt:'—';
+    $('cd').textContent=row.lastDate||'—'; $('cr').textContent=row.regDate||'—';
+    curBox=row.box; $('cust').style.display='block';
+    $('ra').value=''; $('rm').selectedIndex=0; clrMsg('rrm');
+  },150);
+}
+
+function doRecharge(){
+  const amt=$('ra').value.trim(), mon=$('rm').value;
+  if(!amt) return setMsg('rrm','Enter recharge amount.',false);
+  if(!curBox) return setMsg('rrm','No customer loaded.',false);
+  const b=$('rb'); busy(b,true);
+  setTimeout(()=>{
+    const db=load(), i=db.findIndex(r=>r.box===curBox);
+    if(i===-1){ busy(b,false); return setMsg('rrm','Customer not found in DB.',false); }
+    db[i].lastAmt=amt; db[i].months=mon; db[i].lastDate=today();
+    save(db); busy(b,false);
+    setMsg('rrm',`Recharge of ₹${amt} for ${mon} month(s) saved!`,true);
+    $('ca').textContent='₹'+amt; $('cd').textContent=db[i].lastDate;
+  },150);
+}
+
+function doRegister(){
+  const name=$('rn').value.trim(), phone=$('rph').value.trim(),
+        box=$('rbx').value.trim(), amt=$('ramt').value.trim();
+  if(!name) return setMsg('rgm','Name is required.',false);
+  if(!phone) return setMsg('rgm','Phone is required.',false);
+  if(!box) return setMsg('rgm','Box Number is required.',false);
+  const b=$('rgbtn'); busy(b,true);
+  setTimeout(()=>{
+    const db=load();
+    if(db.find(r=>r.box.toLowerCase()===box.toLowerCase())){ busy(b,false); return setMsg('rgm','Box number already registered.',false); }
+    if(db.find(r=>String(r.phone)===phone)){ busy(b,false); return setMsg('rgm','Phone already registered.',false); }
+    db.push({name,phone,box,lastAmt:amt||'0',lastDate:today(),regDate:today(),months:'1'});
+    save(db); busy(b,false);
+    setMsg('rgm','Customer registered successfully!',true);
+    ['rn','rph','rbx','ramt'].forEach(id=>$(id).value='');
+  },150);
+}
+
+function renderStats(){
+  const db=load();
+  const rev=db.reduce((s,r)=>s+Number(r.lastAmt||0),0);
+  const r30=db.filter(r=>{
+    if(!r.lastDate) return false;
+    const p=r.lastDate.split('/');
+    if(p.length<3) return false;
+    return (Date.now()-new Date(p[2],p[1]-1,p[0]))< 30*864e5;
+  }).length;
+  $('statsbar').innerHTML=`
+    <div class="stat"><div class="sn">${db.length}</div><div class="sl">Customers</div></div>
+    <div class="stat"><div class="sn">${r30}</div><div class="sl">Recharged (30d)</div></div>
+    <div class="stat"><div class="sn">₹${rev.toLocaleString('en-IN')}</div><div class="sl">Total Revenue</div></div>`;
+}
+
+function renderTable(){
+  const db=load(), q=($('tsearch').value||'').toLowerCase();
+  const rows=q?db.filter(r=>r.name.toLowerCase().includes(q)||String(r.phone).includes(q)||r.box.toLowerCase().includes(q)):db;
+  const body=$('tbody');
+  if(!rows.length){ body.innerHTML=`<tr class="er"><td colspan="7">No customers found</td></tr>`; return; }
+  body.innerHTML=rows.map((r,i)=>`
+    <tr>
+      <td style="color:var(--muted);font-size:.8rem">${i+1}</td>
+      <td><strong>${esc(r.name)}</strong></td>
+      <td style="font-size:.85rem">${esc(r.phone)}</td>
+      <td style="font-family:monospace;font-size:.85rem">${esc(r.box)}</td>
+      <td><span class="badge">₹${esc(r.lastAmt||0)}</span></td>
+      <td style="font-size:.82rem;color:var(--muted)">${esc(r.lastDate||'—')}</td>
+      <td><button class="xb" onclick="delCust('${esc(r.box)}')">✕</button></td>
+    </tr>`).join('');
+}
+
+function delCust(box){
+  if(!confirm(`Delete customer with Box: ${box}?`)) return;
+  save(load().filter(r=>r.box!==box));
+  renderStats(); renderTable();
+}
+
+function exportCSV(){
+  const db=load();
+  if(!db.length) return alert('No data to export.');
+  const h='Name,Phone,Box No,Last Amount,Last Date,Reg Date\n';
+  const rows=db.map(r=>`"${r.name}","${r.phone}","${r.box}","${r.lastAmt}","${r.lastDate}","${r.regDate}"`).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([h+rows],{type:'text/csv'}));
+  a.download='ankita_customers_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+</script>
+</body>
+</html>
