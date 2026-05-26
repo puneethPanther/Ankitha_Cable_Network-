@@ -1818,7 +1818,284 @@ window.addEventListener(
 );
 </script>
   
-  
+  <script>
+
+/* ══════════════════════════════════════
+   AUTO CLOUD SYNC
+══════════════════════════════════════ */
+
+let lastCloudBackupHash = '';
+let lastRestoreTime = 0;
+
+/* ── Generate simple hash ── */
+function generateHash(data) {
+
+  return btoa(
+    unescape(
+      encodeURIComponent(
+        JSON.stringify(data)
+      )
+    )
+  ).slice(0,50);
+}
+
+/* ── AUTO BACKUP ── */
+async function autoBackupToDrive() {
+
+  if (!driveToken) return;
+
+  try {
+
+    const db = DB.load();
+
+    const currentHash =
+      generateHash(db);
+
+    if (
+      currentHash ===
+      lastCloudBackupHash
+    ) {
+      return;
+    }
+
+    lastCloudBackupHash =
+      currentHash;
+
+    const payload =
+      JSON.stringify({
+
+        backupDate:
+          new Date().toISOString(),
+
+        customers: db,
+
+        adminPin:
+          Pin.get()
+
+      });
+
+    const existingId =
+      await findDriveFile();
+
+    let res;
+
+    if (existingId) {
+
+      res = await fetch(
+
+        `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media`,
+
+        {
+          method: 'PATCH',
+
+          headers: {
+
+            Authorization:
+              `Bearer ${driveToken}`,
+
+            'Content-Type':
+              'application/json'
+          },
+
+          body: payload
+        }
+      );
+
+    } else {
+
+      const metadata =
+        new Blob([JSON.stringify({
+
+          name: DRIVE_FILE,
+
+          mimeType:
+            'application/json'
+
+        })], {
+
+          type:
+            'application/json'
+        });
+
+      const file =
+        new Blob([payload], {
+
+          type:
+            'application/json'
+        });
+
+      const form =
+        new FormData();
+
+      form.append(
+        'metadata',
+        metadata
+      );
+
+      form.append(
+        'file',
+        file
+      );
+
+      res = await fetch(
+
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+
+        {
+          method: 'POST',
+
+          headers: {
+            Authorization:
+            `Bearer ${driveToken}`
+          },
+
+          body: form
+        }
+      );
+
+      const created =
+        await res.json();
+
+      driveFileId =
+        created.id;
+    }
+
+    if (res.ok) {
+
+      console.log(
+        'Auto backup completed'
+      );
+
+      const now =
+        new Date()
+        .toLocaleTimeString();
+
+      document.getElementById(
+        'driveLastBackup'
+      ).innerText =
+        `Synced: ${now}`;
+    }
+
+  } catch(e) {
+
+    console.log(
+      'Auto backup error',
+      e
+    );
+  }
+}
+
+/* ── AUTO RESTORE ── */
+async function autoRestoreFromDrive() {
+
+  if (!driveToken) return;
+
+  try {
+
+    const fileId =
+      await findDriveFile();
+
+    if (!fileId) return;
+
+    const res = await fetch(
+
+      `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+
+      {
+        headers: {
+          Authorization:
+          `Bearer ${driveToken}`
+        }
+      }
+    );
+
+    if (!res.ok) return;
+
+    const cloudData =
+      await res.json();
+
+    if (!cloudData.customers)
+      return;
+
+    const localHash =
+      generateHash(DB.load());
+
+    const cloudHash =
+      generateHash(
+        cloudData.customers
+      );
+
+    if (
+      localHash === cloudHash
+    ) {
+      return;
+    }
+
+    const backupTime =
+      new Date(
+        cloudData.backupDate
+      ).getTime();
+
+    if (
+      backupTime <=
+      lastRestoreTime
+    ) {
+      return;
+    }
+
+    lastRestoreTime =
+      backupTime;
+
+    DB.save(
+      cloudData.customers
+    );
+
+    if (cloudData.adminPin) {
+
+      Pin.set(
+        cloudData.adminPin
+      );
+    }
+
+    console.log(
+      'Cloud changes restored'
+    );
+
+    toast(
+      'Cloud sync updated',
+      'info'
+    );
+
+    renderCustomers?.();
+    renderStats?.();
+    renderRechargeTable?.();
+
+  } catch(e) {
+
+    console.log(
+      'Auto restore error',
+      e
+    );
+  }
+}
+
+/* ══════════════════════════════════════
+   START AUTO SYNC
+══════════════════════════════════════ */
+
+setInterval(() => {
+
+  autoBackupToDrive();
+
+}, 5000);
+
+setInterval(() => {
+
+  autoRestoreFromDrive();
+
+}, 7000);
+
+</script>
   
   
 </body>
