@@ -2,287 +2,1824 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ankita Cable Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Google API -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap');
-:root{--bg:#f4efe6;--ink:#111318;--card:#fdfaf4;--border:#ddd5c0;--accent:#c94800;--muted:#7a7060;--green:#1a6e40;--green-bg:#e8f5ee;--red-bg:#fdecea;--red:#a80000;--header:#141920;--nav:#1c2330}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px}
-header{background:var(--header);padding:1rem 1.5rem;border-bottom:3px solid var(--accent);display:flex;align-items:center;gap:1rem}
-.logo{width:38px;height:38px;background:var(--accent);border-radius:6px;display:grid;place-items:center;font-family:'Teko',sans-serif;font-size:1.25rem;color:#fff;flex-shrink:0}
-header h1{font-family:'Teko',sans-serif;font-size:1.55rem;color:#fff;letter-spacing:.05em;line-height:1}
-header p{font-size:.72rem;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
-nav{background:var(--nav);display:flex;padding:.5rem 1.5rem;gap:4px;flex-wrap:wrap}
-nav button{font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;padding:.42rem 1rem;border:none;border-radius:4px;background:transparent;color:#8a93a6;cursor:pointer;transition:background .15s,color .15s}
+:root {
+  --bg:#f5f0e8; --surface:#fffcf7; --surface2:#faf6ee;
+  --border:#e0d8c8; --border2:#ccc4b0;
+  --accent:#c94800; --accent-dim:#a33a00; --accent-bg:#fff2ec;
+  --dark:#1a1410; --nav:#1e1814;
+  --green:#1a6e40; --green-bg:#eaf5ef;
+  --red:#a80000; --red-bg:#fdecea;
+  --amber:#92600a; --amber-bg:#fef3e0;
+  --blue:#1d4ed8; --blue-bg:#eff6ff;
+  --purple:#6d28d9; --purple-bg:#f5f3ff;
+  --muted:#7a6e60; --muted2:#9e9080; --text:#1a1410;
+  --shadow:0 2px 8px rgba(0,0,0,.08);
+  --shadow-md:0 4px 16px rgba(0,0,0,.12);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* LOCK */
+#lockScreen{position:fixed;inset:0;background:var(--dark);display:flex;justify-content:center;align-items:center;z-index:99999;animation:fadeIn .3s ease}
+.lockBox{width:340px;background:var(--surface);border-radius:12px;padding:2.5rem 2rem;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow-md)}
+.lockLogo{width:56px;height:56px;background:var(--accent);border-radius:10px;display:flex;justify-content:center;align-items:center;font-family:'Teko',sans-serif;font-size:2rem;color:#fff;margin:0 auto 1.25rem}
+.lockBox h1{font-family:'Teko',sans-serif;font-size:1.6rem;font-weight:600;margin-bottom:.25rem}
+.lockBox p{color:var(--muted);font-size:.85rem;margin-bottom:1.5rem}
+.lockBox input{width:100%;padding:.85rem 1rem;border:1.5px solid var(--border2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:1rem;letter-spacing:.2em;text-align:center;background:var(--bg);transition:border-color .2s;margin-bottom:1rem}
+.lockBox input:focus{outline:none;border-color:var(--accent)}
+.lockBox button{width:100%;padding:.85rem;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:background .2s,transform .1s}
+.lockBox button:hover{background:var(--accent-dim)}
+.lockBox button:active{transform:scale(.98)}
+#lockMsg{margin-top:.75rem;font-size:.85rem;color:var(--red);min-height:1.2em}
+
+/* HEADER */
+header{background:var(--nav);color:#fff;padding:.9rem 1.5rem;border-bottom:3px solid var(--accent);display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.logo{width:42px;height:42px;background:var(--accent);border-radius:8px;display:flex;justify-content:center;align-items:center;font-family:'Teko',sans-serif;font-size:1.4rem;flex-shrink:0}
+.headerText h1{font-family:'Teko',sans-serif;font-size:1.3rem;font-weight:600;line-height:1}
+.headerText p{font-size:.7rem;color:#8a9ab0;margin-top:2px}
+.headerActions{margin-left:auto;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+
+/* NAV */
+nav{background:var(--nav);padding:0 1rem .5rem;display:flex;gap:.3rem;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.07)}
+nav button{border:none;background:none;color:#8a9ab0;padding:.55rem .9rem;cursor:pointer;border-radius:6px;font-family:'Syne',sans-serif;font-size:.82rem;font-weight:500;transition:color .15s,background .15s;display:flex;align-items:center;gap:.4rem}
+nav button:hover{color:#ddd;background:rgba(255,255,255,.07)}
 nav button.active{background:var(--accent);color:#fff}
-nav button:not(.active):hover{background:rgba(255,255,255,.07);color:#ccc}
-.page{display:none;padding:1.25rem 1rem 3rem;max-width:580px;margin:0 auto}
-.page.on{display:block}
-.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.1rem 1.2rem;margin-bottom:1rem}
-.ch{font-family:'Teko',sans-serif;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.85rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
-.field{margin-bottom:.85rem}
-label{display:block;font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.28rem}
-input,select{width:100%;padding:.6rem .75rem;border:1.5px solid var(--border);border-radius:5px;font-family:'DM Sans',sans-serif;font-size:1rem;background:#fff;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
-input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,72,0,.1)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
-.btn{font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;padding:.62rem 1.2rem;border:none;border-radius:5px;cursor:pointer;transition:opacity .15s,transform .1s;display:inline-flex;align-items:center;gap:.4rem;margin-top:.1rem}
+
+/* PAGE */
+.page{display:none;padding:1.25rem;max-width:1100px;margin:auto}
+.page.on{display:block;animation:slideIn .2s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.cardHead{display:flex;align-items:center;gap:.6rem;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+.cardHead h2{font-family:'Teko',sans-serif;font-size:1.2rem;font-weight:600;letter-spacing:.02em}
+.cardHead .badge{margin-left:auto}
+
+/* GRID */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.four{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem}
+
+/* FIELD */
+.field{margin-bottom:.9rem}
+label{display:block;margin-bottom:.35rem;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+input,select,textarea{width:100%;padding:.75rem .9rem;border:1.5px solid var(--border2);border-radius:7px;font-family:'Syne',sans-serif;font-size:.9rem;color:var(--text);background:var(--bg);transition:border-color .2s,box-shadow .2s}
+textarea{resize:vertical;min-height:70px;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,72,0,.12);background:#fff}
+input.error{border-color:var(--red)}
+input[type="password"]{letter-spacing:.15em;font-family:'JetBrains Mono',monospace}
+select{cursor:pointer}
+
+/* BUTTONS */
+.btn{border:none;padding:.75rem 1.2rem;border-radius:7px;cursor:pointer;font-family:'Syne',sans-serif;font-size:.88rem;font-weight:600;transition:background .15s,transform .1s,box-shadow .15s;display:inline-flex;align-items:center;gap:.4rem}
 .btn:active{transform:scale(.97)}
-.btn:disabled{opacity:.45;cursor:default}
-.btn-p{background:var(--accent);color:#fff}
-.btn-p:not(:disabled):hover{opacity:.88}
-.btn-g{background:transparent;border:1.5px solid var(--border);color:var(--ink);font-size:.82rem;padding:.38rem .8rem;margin-top:0}
-.btn-g:hover{border-color:var(--accent);color:var(--accent)}
-.srow{display:flex;gap:.5rem}
-.srow input{flex:1}
-#cust{display:none}
-.igrid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem;margin-bottom:.9rem}
-.inf label{margin-bottom:.1rem}
-.inf p{font-size:1rem;font-weight:600}
-hr{border:none;border-top:1px solid var(--border);margin:.85rem 0}
-.msg{font-size:.83rem;padding:.45rem .75rem;border-radius:5px;margin-top:.6rem;display:none}
-.msg.ok{background:var(--green-bg);color:var(--green);display:block}
-.msg.err{background:var(--red-bg);color:var(--red);display:block}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;text-align:center}
-.sn{font-family:'Teko',sans-serif;font-size:1.8rem;line-height:1;color:var(--accent)}
-.sl{font-size:.68rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
-#records-page .card{padding:0;overflow:hidden}
-.thead{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.2rem;border-bottom:1px solid var(--border);gap:.5rem;flex-wrap:wrap}
-.thead h2{font-family:'Teko',sans-serif;font-size:1.1rem;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
-#tsearch{max-width:180px;font-size:.85rem;padding:.38rem .65rem}
-.tw{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:.85rem}
-th{background:#f0ebe0;font-size:.7rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:.55rem .85rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:.6rem .85rem;border-bottom:1px solid #ede8dc;vertical-align:middle}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dim);box-shadow:0 3px 10px rgba(201,72,0,.3)}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg);color:var(--text)}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #f0c0c0}
+.btn-danger:hover{background:#f8d0d0}
+.btn-warning{background:var(--amber-bg);color:var(--amber);border:1px solid #e8c87a}
+.btn-warning:hover{background:#fde8b0}
+.btn-blue{background:var(--blue-bg);color:var(--blue);border:1px solid #bfdbfe}
+.btn-blue:hover{background:#dbeafe}
+.btn-purple{background:var(--purple-bg);color:var(--purple);border:1px solid #ddd6fe}
+.btn-purple:hover{background:#ede9fe}
+.btn-sm{padding:.4rem .7rem;font-size:.78rem;border-radius:5px}
+.btn-full{width:100%;justify-content:center}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.stat::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent)}
+.stat.green::before{background:var(--green)}
+.stat.amber::before{background:var(--amber)}
+.stat.blue::before{background:#2563eb}
+.statNum{font-family:'Teko',sans-serif;font-size:2rem;line-height:1;color:var(--accent);margin-bottom:.15rem}
+.stat.green .statNum{color:var(--green)}
+.stat.amber .statNum{color:var(--amber)}
+.stat.blue .statNum{color:#2563eb}
+.statLabel{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+
+/* TABLE */
+.tableWrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--surface2)}
+th{padding:.7rem 1rem;text-align:left;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:.75rem 1rem;border-bottom:1px solid var(--border);font-size:.88rem;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#faf5ec}
-.badge{font-size:.7rem;font-weight:600;padding:.18rem .5rem;border-radius:99px;background:var(--green-bg);color:var(--green)}
-.er td{text-align:center;color:var(--muted);font-style:italic;padding:2rem}
-.xb{background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem;padding:.2rem .3rem;border-radius:3px;transition:color .15s,background .15s}
-.xb:hover{color:var(--red);background:var(--red-bg)}
-.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;display:inline-block}
-@keyframes sp{to{transform:rotate(360deg)}}
-@media(max-width:480px){
-  .two{grid-template-columns:1fr}
+tr:hover td{background:var(--surface2)}
+.emptyRow td{text-align:center;color:var(--muted2);padding:3rem 1rem;font-size:.9rem}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;border-radius:99px;font-size:.72rem;font-weight:700;letter-spacing:.03em}
+.badge-green{background:var(--green-bg);color:var(--green)}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-amber{background:var(--amber-bg);color:var(--amber)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.badge-purple{background:var(--purple-bg);color:var(--purple)}
+
+/* SEARCH ROW */
+.searchRow{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap}
+.searchInput{max-width:280px;flex:1;position:relative}
+.searchInput input{padding-left:2.2rem}
+.searchInput::before{content:'⌕';position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:1.1rem;pointer-events:none;z-index:1}
+
+/* CUSTOMER DETAILS */
+.customerDetails{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.25rem}
+.detailItem label{margin-bottom:.2rem}
+.detailItem .value{font-size:1rem;font-weight:600;color:var(--text)}
+.detailItem .value.mono{font-family:'JetBrains Mono',monospace;font-size:.9rem}
+.divider{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
+
+/* MODAL */
+.modalBg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;justify-content:center;align-items:center;z-index:9999;padding:1rem;backdrop-filter:blur(2px)}
+.modalBg.open{display:flex;animation:fadeIn .2s ease}
+.modal{width:100%;max-width:460px;background:var(--surface);border-radius:12px;padding:1.75rem;border:1px solid var(--border);box-shadow:var(--shadow-md);animation:slideIn .2s ease;max-height:90vh;overflow-y:auto}
+.modal h2{font-family:'Teko',sans-serif;font-size:1.3rem;margin-bottom:1.25rem}
+.modalActions{display:flex;gap:.6rem;margin-top:1.25rem}
+.modalActions .btn{flex:1;justify-content:center}
+
+/* TOAST */
+#toastContainer{position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:.5rem;z-index:999999}
+.toast{padding:.75rem 1.1rem;border-radius:8px;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.5rem;box-shadow:var(--shadow-md);animation:toastIn .25s ease;max-width:320px}
+.toast-ok{background:var(--green);color:#fff}
+.toast-err{background:var(--red);color:#fff}
+.toast-info{background:var(--dark);color:#fff}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{from{opacity:1}to{opacity:0}}
+
+/* BANNERS */
+.expiryWarn{background:var(--amber-bg);border:1px solid #f0c87a;border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--amber);display:flex;align-items:center;gap:.5rem;margin-bottom:1rem}
+.infoBanner{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--blue);margin-bottom:1rem}
+.successBanner{background:var(--green-bg);border:1px solid #a7f3d0;border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--green);margin-bottom:1rem}
+
+/* SECTION TABS */
+.sectionTabs{display:flex;gap:.5rem;flex-wrap:wrap}
+.sectionTab{padding:.45rem .9rem;border:1.5px solid var(--border2);border-radius:6px;background:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:.82rem;font-weight:600;color:var(--muted);transition:all .15s}
+.sectionTab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* NOTE CHIP */
+.noteChip{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:.2rem .5rem;font-size:.75rem;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}
+
+/* BOX HISTORY */
+.boxHistoryItem{display:flex;align-items:flex-start;gap:.6rem;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.85rem}
+.boxHistoryItem:last-child{border-bottom:none}
+.boxHistoryDot{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:.35rem;flex-shrink:0}
+.revoked{opacity:.55;text-decoration:line-through}
+
+/* DRIVE STATUS BAR */
+#driveStatusBar{background:var(--nav);border-top:1px solid rgba(255,255,255,.08);padding:.4rem 1.5rem;display:flex;align-items:center;gap:.75rem;font-size:.75rem;color:#8a9ab0}
+#driveStatusBar .dsIcon{font-size:.9rem}
+#driveStatusBar strong{color:#ccc}
+.driveConnected{color:#4ade80 !important}
+.driveDisconnected{color:#f87171 !important}
+
+/* DRIVE MODAL STEPS */
+.stepList{list-style:none;counter-reset:steps}
+.stepList li{counter-increment:steps;display:flex;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.87rem;color:var(--muted)}
+.stepList li:last-child{border-bottom:none}
+.stepList li::before{content:counter(steps);width:22px;height:22px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;margin-top:.1rem}
+.stepList li strong{color:var(--text)}
+
+/* SPINNER */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:768px){
+  .two,.three,.four,.customerDetails{grid-template-columns:1fr}
   .stats{grid-template-columns:1fr 1fr}
-  .stats .stat:last-child{grid-column:1/-1}
-  header h1{font-size:1.25rem}
-  #tsearch{max-width:120px}
+  .searchRow{flex-direction:column;align-items:stretch}
+  .searchInput{max-width:100%}
+  .headerActions{gap:.3rem}
+  .btn{padding:.6rem .8rem;font-size:.8rem}
+}
+@media(max-width:480px){
+  .stats{grid-template-columns:1fr}
+  header{padding:.75rem 1rem}
+  .page{padding:.75rem}
 }
 </style>
 </head>
 <body>
 
+<div id="toastContainer"></div>
+
+<!-- ══ LOCK ══ -->
+<div id="lockScreen">
+  <div class="lockBox">
+    <div class="lockLogo">A</div>
+    <h1>Ankita Cable Network</h1>
+    <p>Enter your admin PIN to continue</p>
+    <input type="password" id="lockPin" placeholder="••••" maxlength="8" autofocus>
+    <button onclick="unlockSystem()">Unlock System</button>
+    <div id="lockMsg"></div>
+  </div>
+</div>
+
+<!-- ══ HEADER ══ -->
 <header>
   <div class="logo">A</div>
-  <div>
+  <div class="headerText">
     <h1>Ankita Cable Network</h1>
-    <p>Customer Management</p>
+    <p>Customer Management System</p>
+  </div>
+  <div class="headerActions">
+    <button class="btn btn-ghost" onclick="exportCSV()" style="color:#aaa;border-color:#444">↓ CSV</button>
+    <button class="btn btn-purple" id="driveBackupBtn" onclick="driveBackup()" style="display:none">☁ Backup</button>
+    <button class="btn btn-blue" id="driveRestoreBtn" onclick="driveRestore()" style="display:none">☁ Restore</button>
+    <button class="btn" id="driveSignInBtn" onclick="driveSignIn()" style="background:#4285f4;color:#fff;display:none">
+      <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#fff" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5c10.8 0 19.5-8.7 19.5-19.5 0-1.2-.1-2.3-.4-3.5z"/></svg>
+      Sign in
+    </button>
+    <button class="btn btn-ghost" id="driveSignOutBtn" onclick="driveSignOut()" style="color:#aaa;border-color:#444;display:none">Sign Out</button>
+    <button class="btn btn-primary" onclick="openModal('adminPanel')">⚙ Admin</button>
   </div>
 </header>
 
+<!-- ══ DRIVE STATUS BAR ══ -->
+<div id="driveStatusBar">
+  <span class="dsIcon">☁</span>
+  <span id="driveStatusText">Google Drive: <strong>Not connected</strong> — <a href="#" onclick="openModal('driveSetupModal');return false" style="color:#6ea8fe">connect now</a></span>
+  <span id="driveLastBackup" style="margin-left:auto"></span>
+</div>
+
+<!-- ══ NAV ══ -->
 <nav>
-  <button class="active" onclick="goNav('search',this)">Search &amp; Recharge</button>
-  <button onclick="goNav('reg',this)">New Registration</button>
-  <button onclick="goNav('records',this)">All Records</button>
+  <button class="active" onclick="goNav('search',this)"><span>⚡</span> Search & Recharge</button>
+  <button onclick="goNav('register',this)"><span>＋</span> Registration</button>
+  <button onclick="goNav('customers',this)"><span>👥</span> Customers</button>
+  <button onclick="goNav('recharges',this)"><span>📋</span> Recharges</button>
 </nav>
 
-<!-- SEARCH -->
+<!-- ══ PAGE: SEARCH ══ -->
 <div id="search-page" class="page on">
   <div class="card">
-    <div class="ch">Find Customer</div>
-    <div class="field">
-      <label>Phone or Box Number</label>
-      <div class="srow">
-        <input id="q" placeholder="e.g. 9876543210 or BOX001" onkeydown="if(event.key==='Enter')doSearch()">
-        <button class="btn btn-p" id="fb" onclick="doSearch()">Fetch</button>
-      </div>
-    </div>
-    <div id="fm" class="msg"></div>
-  </div>
-
-  <div id="cust">
-    <div class="card">
-      <div class="ch">Customer Details</div>
-      <div class="igrid">
-        <div class="inf"><label>Name</label><p id="cn">—</p></div>
-        <div class="inf"><label>Box Number</label><p id="cb">—</p></div>
-        <div class="inf"><label>Phone</label><p id="cp">—</p></div>
-        <div class="inf"><label>Last Recharge</label><p id="ca">—</p></div>
-        <div class="inf"><label>Last Date</label><p id="cd">—</p></div>
-        <div class="inf"><label>Registered</label><p id="cr">—</p></div>
-      </div>
-      <hr>
-      <div class="ch" style="border:none;padding:0;margin-bottom:.75rem">New Recharge</div>
-      <div class="two">
-        <div class="field"><label>Amount (₹)</label><input id="ra" type="number" min="1" placeholder="300"></div>
-        <div class="field"><label>Months</label><select id="rm"></select></div>
-      </div>
-      <button class="btn btn-p" id="rb" onclick="doRecharge()">Submit Recharge</button>
-      <div id="rrm" class="msg"></div>
-    </div>
-  </div>
-</div>
-
-<!-- REGISTER -->
-<div id="reg-page" class="page">
-  <div class="card">
-    <div class="ch">Register New Customer</div>
-    <div class="field"><label>Full Name</label><input id="rn" placeholder="Customer full name"></div>
+    <div class="cardHead"><h2>⚡ Search Customer</h2></div>
     <div class="two">
-      <div class="field"><label>Phone</label><input id="rph" type="tel" placeholder="10-digit number"></div>
-      <div class="field"><label>Box Number</label><input id="rbx" placeholder="e.g. BOX001"></div>
+      <div class="field" style="margin:0">
+        <label>Phone Number or Box Number</label>
+        <input id="searchInput" placeholder="Enter phone or box number" onkeydown="if(event.key==='Enter')searchCustomer()">
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="btn btn-primary btn-full" onclick="searchCustomer()">Fetch Customer</button>
+      </div>
     </div>
-    <div class="field"><label>Initial Recharge (₹)</label><input id="ramt" type="number" min="0" placeholder="500"></div>
-    <button class="btn btn-p" id="rgbtn" onclick="doRegister()">Register Customer</button>
-    <div id="rgm" class="msg"></div>
+  </div>
+
+  <div id="customerCard" style="display:none">
+    <div class="card">
+      <div class="cardHead">
+        <h2>Customer Details</h2>
+        <span id="statusBadge" class="badge"></span>
+        <div style="margin-left:auto;display:flex;gap:.4rem">
+          <button class="btn btn-blue btn-sm" onclick="openBoxChange()">📦 Change Box</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearSearch()">✕ Clear</button>
+        </div>
+      </div>
+      <div id="expiryWarnBanner" class="expiryWarn" style="display:none">⚠ Subscription expiring soon</div>
+      <div class="customerDetails">
+        <div class="detailItem"><label>Full Name</label><div class="value" id="cname">—</div></div>
+        <div class="detailItem"><label>Phone</label><div class="value mono" id="cphone">—</div></div>
+        <div class="detailItem"><label>Box Number</label><div class="value mono" id="cbox">—</div></div>
+        <div class="detailItem"><label>Expiry Date</label><div class="value" id="cexp">—</div></div>
+      </div>
+      <hr class="divider">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <h2 style="font-family:'Teko',sans-serif;font-size:1.2rem;font-weight:600">Process Recharge</h2>
+        <button class="btn btn-warning btn-sm" onclick="openRevokeModal()" id="revokeBtn" style="display:none">↩ Revoke Last Recharge</button>
+      </div>
+      <div class="four">
+        <div class="field">
+          <label>Recharge Amount (₹)</label>
+          <input type="number" id="ramount" min="0" placeholder="0">
+        </div>
+        <div class="field">
+          <label>Duration</label>
+          <select id="rmonths">
+            <option value="1">1 Month</option>
+            <option value="2">2 Months</option>
+            <option value="3">3 Months</option>
+            <option value="6">6 Months</option>
+            <option value="12">12 Months</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Admin PIN</label>
+          <input type="password" id="rechargePin" placeholder="••••">
+        </div>
+        <div class="field">
+          <label>Note (optional)</label>
+          <input type="text" id="rechargeNote" placeholder="e.g. paid by UPI" maxlength="80">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="submitRecharge()">✔ Submit Recharge</button>
+    </div>
   </div>
 </div>
 
-<!-- RECORDS -->
-<div id="records-page" class="page">
-  <div class="stats" id="statsbar"></div>
+<!-- ══ PAGE: REGISTER ══ -->
+<div id="register-page" class="page">
   <div class="card">
-    <div class="thead">
-      <h2>All Customers</h2>
-      <div style="display:flex;gap:.5rem;align-items:center">
-        <input id="tsearch" placeholder="Search…" oninput="renderTable()">
-        <button class="btn btn-g" onclick="exportCSV()">Export CSV</button>
+    <div class="cardHead"><h2>＋ Register New Customer</h2></div>
+    <div class="field"><label>Full Name *</label><input id="rname" placeholder="Customer full name"></div>
+    <div class="two">
+      <div class="field"><label>Phone Number *</label><input id="rphone" placeholder="10-digit mobile number" maxlength="10"></div>
+      <div class="field"><label>Box / STB Number *</label><input id="rbox" placeholder="Set-top box ID"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label>Initial Recharge Amount (₹)</label><input id="ramt" type="number" min="0" placeholder="0"></div>
+      <div class="field">
+        <label>Duration</label>
+        <select id="rmon">
+          <option value="1">1 Month</option><option value="2">2 Months</option>
+          <option value="3">3 Months</option><option value="6">6 Months</option>
+          <option value="12">12 Months</option>
+        </select>
       </div>
     </div>
-    <div class="tw">
+    <div class="field"><label>Initial Note (optional)</label><input id="rnote" placeholder="e.g. referred by neighbour" maxlength="80"></div>
+    <button class="btn btn-primary" onclick="registerCustomer()">Register Customer</button>
+  </div>
+</div>
+
+<!-- ══ PAGE: CUSTOMERS ══ -->
+<div id="customers-page" class="page">
+  <div class="stats" id="statsBar"></div>
+  <div class="card">
+    <div class="cardHead"><h2>👥 Customers</h2></div>
+    <div class="searchRow">
+      <div class="searchInput"><input id="customerSearch" placeholder="Search by name, phone or box…" oninput="renderCustomers()"></div>
+      <div class="sectionTabs" id="filterTabs">
+        <button class="sectionTab active" onclick="setFilter('all',this)">All</button>
+        <button class="sectionTab" onclick="setFilter('active',this)">Active</button>
+        <button class="sectionTab" onclick="setFilter('expired',this)">Expired</button>
+        <button class="sectionTab" onclick="setFilter('expiringSoon',this)">Expiring Soon</button>
+      </div>
+    </div>
+    <div class="tableWrap">
       <table>
-        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Box</th><th>Last ₹</th><th>Date</th><th></th></tr></thead>
-        <tbody id="tbody"></tbody>
+        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Box</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="customersBody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
+<!-- ══ PAGE: RECHARGES ══ -->
+<div id="recharges-page" class="page">
+  <div class="card">
+    <div class="cardHead"><h2>📋 Recharge History</h2></div>
+    <div class="searchRow">
+      <div class="searchInput"><input id="rechargeSearch" placeholder="Search by name, phone or box…" oninput="renderRechargeTable()"></div>
+    </div>
+    <div class="tableWrap">
+      <table>
+        <thead><tr><th>#</th><th>Name</th><th>Box</th><th>Amount</th><th>Months</th><th>Date</th><th>Valid Till</th><th>Note</th><th>Status</th></tr></thead>
+        <tbody id="rechargeBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ADMIN PIN ══ -->
+<div class="modalBg" id="adminPanel">
+  <div class="modal">
+    <h2>⚙ Change Admin PIN</h2>
+    <div class="field"><label>Current PIN</label><input type="password" id="oldPin" placeholder="••••"></div>
+    <div class="field"><label>New PIN (min 4 digits)</label><input type="password" id="newPin" placeholder="••••"></div>
+    <div class="field"><label>Confirm New PIN</label><input type="password" id="confirmPin" placeholder="••••"></div>
+    <div class="modalActions">
+      <button class="btn btn-ghost" onclick="closeModal('adminPanel')">Cancel</button>
+      <button class="btn btn-primary" onclick="changeAdminPin()">Save PIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: EDIT CUSTOMER ══ -->
+<div class="modalBg" id="editModal">
+  <div class="modal">
+    <h2>✏ Edit Customer</h2>
+    <input type="hidden" id="editBox">
+    <div class="field"><label>Full Name</label><input id="editName"></div>
+    <div class="field"><label>Phone Number</label><input id="editPhone" maxlength="10"></div>
+    <div class="modalActions">
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: DELETE ══ -->
+<div class="modalBg" id="deleteModal">
+  <div class="modal">
+    <h2>🗑 Delete Customer</h2>
+    <p style="color:var(--muted);margin-bottom:1rem;font-size:.9rem">Permanently delete <strong id="deleteCustomerName"></strong>? Cannot be undone.</p>
+    <div class="field"><label>Admin PIN to confirm</label><input type="password" id="deletePin" placeholder="••••"></div>
+    <div class="modalActions">
+      <button class="btn btn-ghost" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CHANGE BOX ══ -->
+<div class="modalBg" id="boxChangeModal">
+  <div class="modal">
+    <h2>📦 Replace Box Number</h2>
+    <div class="infoBanner">ℹ Use when a customer's box is damaged, stolen, or replaced. All history is preserved.</div>
+    <div class="field"><label>Current Box Number</label><input id="oldBoxDisplay" disabled style="opacity:.6"></div>
+    <div class="field"><label>New Box Number *</label><input id="newBoxNumber" placeholder="Enter new box/STB ID"></div>
+    <div class="field">
+      <label>Reason *</label>
+      <select id="boxChangeReason">
+        <option value="">— Select reason —</option>
+        <option value="Damaged">Box damaged</option>
+        <option value="Stolen">Box stolen</option>
+        <option value="Upgraded">Upgraded to new box</option>
+        <option value="Faulty">Box faulty / not working</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Notes (optional)</label><textarea id="boxChangeNote" placeholder="Any extra details…"></textarea></div>
+    <div class="field"><label>Admin PIN *</label><input type="password" id="boxChangePin" placeholder="••••"></div>
+    <div id="boxHistorySection" style="display:none;margin-top:1rem">
+      <label style="margin-bottom:.5rem">Previous Box Changes</label>
+      <div id="boxHistoryList" style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:.75rem"></div>
+    </div>
+    <div class="modalActions">
+      <button class="btn btn-ghost" onclick="closeModal('boxChangeModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmBoxChange()">Confirm Change</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: REVOKE RECHARGE ══ -->
+<div class="modalBg" id="revokeModal">
+  <div class="modal">
+    <h2>↩ Revoke Last Recharge</h2>
+    <div id="revokeInfo" style="background:var(--red-bg);border:1px solid #f0c0c0;border-radius:8px;padding:1rem;margin-bottom:1rem;font-size:.88rem"></div>
+    <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem">This marks the last recharge as revoked and restores the previous expiry date.</p>
+    <div class="field"><label>Reason *</label><input id="revokeReason" placeholder="e.g. TV not working, signal issue…"></div>
+    <div class="field"><label>Admin PIN *</label><input type="password" id="revokePin" placeholder="••••"></div>
+    <div class="modalActions">
+      <button class="btn btn-ghost" onclick="closeModal('revokeModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmRevoke()">Revoke Recharge</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: GOOGLE DRIVE SETUP ══ -->
+<div class="modalBg" id="driveSetupModal">
+  <div class="modal" style="max-width:520px">
+    <h2>☁ Connect Google Drive Backup</h2>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:1.25rem">
+      Like WhatsApp — your data stays on this device but you can back up to Google Drive anytime and restore it on any device.
+    </p>
+
+    <div id="driveSetupNotConnected">
+      <div style="background:var(--green-bg);border:1px solid #a7f3d0;border-radius:8px;padding:1rem;margin-bottom:1.25rem;font-size:.85rem;color:var(--green)">
+        ✔ Your Google Client ID is already configured. Just sign in below.
+      </div>
+      <div style="margin-bottom:1.25rem">
+        <label style="margin-bottom:.6rem">What happens after connecting:</label>
+        <ul class="stepList">
+          <li><span><strong>☁ Backup</strong> button saves all customer data to a file in your Google Drive</span></li>
+          <li><span><strong>☁ Restore</strong> button loads data back from Drive — works on any device</span></li>
+          <li><span>Your data is saved as <strong>ankita-cable-backup.json</strong> in your Drive</span></li>
+          <li><span>Only your Google account can access it — completely private</span></li>
+        </ul>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="driveSignIn();closeModal('driveSetupModal')" style="background:#4285f4">
+        <svg width="16" height="16" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#fff" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5c10.8 0 19.5-8.7 19.5-19.5 0-1.2-.1-2.3-.4-3.5z"/></svg>
+        Sign in with Google
+      </button>
+    </div>
+
+    <div id="driveSetupConnected" style="display:none">
+      <div class="successBanner">✔ Connected to Google Drive! Use the ☁ Backup and ☁ Restore buttons in the header.</div>
+      <div style="display:flex;gap:.6rem;margin-top:.5rem">
+        <button class="btn btn-purple btn-full" onclick="driveBackup();closeModal('driveSetupModal')">☁ Backup Now</button>
+        <button class="btn btn-blue btn-full" onclick="driveRestore();closeModal('driveSetupModal')">☁ Restore from Drive</button>
+      </div>
+    </div>
+
+    <div class="modalActions">
+      <button class="btn btn-ghost btn-full" onclick="closeModal('driveSetupModal')">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const KEY = 'acn_db';
-const load = () => { try { return JSON.parse(localStorage.getItem(KEY)||'[]'); } catch { return []; } };
-const save = d => localStorage.setItem(KEY, JSON.stringify(d));
-const $    = id => document.getElementById(id);
-const today= () => new Date().toLocaleDateString('en-IN');
-const esc  = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+/* ══════════════════════════════════════
+   CONSTANTS
+══════════════════════════════════════ */
+const STORAGE_KEY  = 'ankitaCableDB';
+const PIN_KEY      = 'ankitaAdminPin';
+const DRIVE_FILE   = 'ankita-cable-backup.json';
+const CLIENT_ID    = '116734775725-aag2eetv2ul6olt14s5tft2u0nb58et5.apps.googleusercontent.com';
+const SCOPES       = 'https://www.googleapis.com/auth/drive.file';
 
-function setMsg(id,t,ok){ const e=$(id); e.className='msg '+(ok?'ok':'err'); e.textContent=t; }
-function clrMsg(id){ const e=$(id); e.className='msg'; e.textContent=''; }
-function busy(b,on){ b.disabled=on; if(on){b._t=b.innerHTML;b.innerHTML='<span class="spin"></span>';} else b.innerHTML=b._t; }
+if (!localStorage.getItem(PIN_KEY)) localStorage.setItem(PIN_KEY, '1234');
 
-// months
-(()=>{ const s=$('rm'); for(let i=1;i<=12;i++) s.add(new Option(i+' Month'+(i>1?'s':''),i)); })();
+let customerFilter  = 'all';
+let pendingDeleteBox= null;
+let currentCustomer = null;
+let driveToken      = null;
+let driveFileId     = null; // cached Drive file ID
 
-function goNav(p,btn){
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
-  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
-  $(p+'-page').classList.add('on');
+/* ── DB ── */
+const DB = {
+  load() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); } catch { return []; } },
+  save(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+};
+
+/* ── PIN ── */
+const Pin = {
+  get()    { return localStorage.getItem(PIN_KEY); },
+  set(v)   { localStorage.setItem(PIN_KEY, v); },
+  check(v) { return v === this.get(); }
+};
+
+/* ══════════════════════════════════════
+   DATE HELPERS
+══════════════════════════════════════ */
+function todayISO()       { return new Date().toISOString().slice(0,10); }
+function addMonths(s,m)   { const d=new Date(s); d.setMonth(d.getMonth()+Number(m)); return d.toISOString().slice(0,10); }
+function formatDate(s)    { if(!s) return '—'; const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`; }
+function daysUntil(s)     { const n=new Date(); n.setHours(0,0,0,0); return Math.round((new Date(s)-n)/86400000); }
+function isActive(c)      { return daysUntil(c.expiryDate)>=0; }
+function isExpiringSoon(c){ const d=daysUntil(c.expiryDate); return d>=0&&d<=7; }
+function uid()            { return Math.random().toString(36).slice(2,10); }
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function toast(msg, type='ok') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<span>${type==='ok'?'✔':type==='err'?'✕':'ℹ'}</span> ${msg}`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(()=>{ el.style.animation='toastOut .3s ease forwards'; setTimeout(()=>el.remove(),300); }, 3500);
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function markError(id,h){ const e=document.getElementById(id); if(e) e.classList.toggle('error',h); }
+
+/* ══════════════════════════════════════
+   GOOGLE DRIVE — OAuth2 via GIS
+══════════════════════════════════════ */
+let tokenClient;
+
+function initGoogleAuth() {
+  if (typeof google === 'undefined') {
+    setTimeout(initGoogleAuth, 500);
+    return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: async (resp) => {
+      if (resp.error) { toast('Google sign-in failed: ' + resp.error, 'err'); return; }
+      driveToken = resp.access_token;
+      onDriveSignedIn();
+    }
+  });
+  // Show sign-in button now that library is ready
+  document.getElementById('driveSignInBtn').style.display = 'inline-flex';
+  updateDriveStatus();
+}
+
+function driveSignIn() {
+  if (!tokenClient) { toast('Google library still loading, try again in a moment','info'); return; }
+  tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+function driveSignOut() {
+  if (driveToken) {
+    google.accounts.oauth2.revoke(driveToken, ()=>{});
+    driveToken = null;
+    driveFileId = null;
+  }
+  updateDriveStatus();
+  toast('Signed out from Google Drive','info');
+}
+
+function onDriveSignedIn() {
+  updateDriveStatus();
+  toast('Google Drive connected ✔','ok');
+}
+
+function updateDriveStatus() {
+  const connected = !!driveToken;
+  const statusText = document.getElementById('driveStatusText');
+  const lastBackup = document.getElementById('driveLastBackup');
+  const lb = localStorage.getItem('ankitaLastBackup');
+
+  document.getElementById('driveSignInBtn').style.display   = connected ? 'none' : 'inline-flex';
+  document.getElementById('driveSignOutBtn').style.display  = connected ? 'inline-flex' : 'none';
+  document.getElementById('driveBackupBtn').style.display   = connected ? 'inline-flex' : 'none';
+  document.getElementById('driveRestoreBtn').style.display  = connected ? 'inline-flex' : 'none';
+
+  if (connected) {
+    statusText.innerHTML = `<span class="driveConnected">☁ Google Drive connected</span>`;
+    document.getElementById('driveSetupConnected').style.display    = 'block';
+    document.getElementById('driveSetupNotConnected').style.display = 'none';
+  } else {
+    statusText.innerHTML = `☁ Google Drive: <strong>Not connected</strong> — <a href="#" onclick="openModal('driveSetupModal');return false" style="color:#6ea8fe">connect now</a>`;
+    document.getElementById('driveSetupConnected').style.display    = 'none';
+    document.getElementById('driveSetupNotConnected').style.display = 'block';
+  }
+
+  lastBackup.innerText = lb ? `Last backup: ${lb}` : '';
+}
+
+/* ── Find existing backup file on Drive ── */
+async function findDriveFile() {
+  if (driveFileId) return driveFileId;
+  const res = await fetch(
+    `https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FILE}' and trashed=false&fields=files(id,name)`,
+    { headers: { Authorization: `Bearer ${driveToken}` } }
+  );
+  const data = await res.json();
+  if (data.files && data.files.length > 0) {
+    driveFileId = data.files[0].id;
+    return driveFileId;
+  }
+  return null;
+}
+
+/* ── BACKUP TO DRIVE ── */
+async function driveBackup() {
+  if (!driveToken) { toast('Sign in to Google Drive first','err'); return; }
+  const btn = document.getElementById('driveBackupBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Saving…`;
+
+  try {
+    const payload = JSON.stringify({
+      backupDate: new Date().toISOString(),
+      appVersion: '2.0',
+      customers: DB.load(),
+      adminPin: Pin.get()
+    }, null, 2);
+
+    const existingId = await findDriveFile();
+    let res;
+
+    if (existingId) {
+      // UPDATE existing file
+      res = await fetch(
+        `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media`,
+        {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${driveToken}`, 'Content-Type': 'application/json' },
+          body: payload
+        }
+      );
+    } else {
+      // CREATE new file
+      const meta = new Blob([JSON.stringify({ name: DRIVE_FILE, mimeType: 'application/json' })], { type: 'application/json' });
+      const content = new Blob([payload], { type: 'application/json' });
+      const form = new FormData();
+      form.append('metadata', meta);
+      form.append('file', content);
+      res = await fetch(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+        { method: 'POST', headers: { Authorization: `Bearer ${driveToken}` }, body: form }
+      );
+      const created = await res.json();
+      driveFileId = created.id;
+    }
+
+    if (res.ok) {
+      const now = new Date().toLocaleString('en-IN');
+      localStorage.setItem('ankitaLastBackup', now);
+      document.getElementById('driveLastBackup').innerText = `Last backup: ${now}`;
+      toast(`Backup saved to Google Drive ✔`, 'ok');
+    } else {
+      const err = await res.json();
+      toast('Backup failed: ' + (err.error?.message || 'unknown error'), 'err');
+    }
+  } catch(e) {
+    toast('Backup error: ' + e.message, 'err');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '☁ Backup';
+}
+
+/* ── RESTORE FROM DRIVE ── */
+async function driveRestore() {
+  if (!driveToken) { toast('Sign in to Google Drive first','err'); return; }
+  if (!confirm('This will REPLACE all local data with the Drive backup.\n\nAre you sure?')) return;
+
+  const btn = document.getElementById('driveRestoreBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Restoring…`;
+
+  try {
+    const fileId = await findDriveFile();
+    if (!fileId) {
+      toast('No backup found on Google Drive. Please backup first.', 'err');
+      btn.disabled=false; btn.innerHTML='☁ Restore'; return;
+    }
+
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+      { headers: { Authorization: `Bearer ${driveToken}` } }
+    );
+
+    if (!res.ok) { toast('Failed to download backup','err'); btn.disabled=false; btn.innerHTML='☁ Restore'; return; }
+
+    const data = await res.json();
+
+    if (data.customers) {
+      DB.save(data.customers);
+      if (data.adminPin) Pin.set(data.adminPin);
+      const backupDate = data.backupDate ? new Date(data.backupDate).toLocaleString('en-IN') : 'unknown';
+      toast(`Restored ${data.customers.length} customers from backup (${backupDate}) ✔`, 'ok');
+    } else {
+      toast('Backup file format invalid','err');
+    }
+  } catch(e) {
+    toast('Restore error: ' + e.message, 'err');
+  }
+
+  btn.disabled=false; btn.innerHTML='☁ Restore';
+}
+
+// Init Google Auth when page loads
+window.addEventListener('load', initGoogleAuth);
+
+/* ══════════════════════════════════════
+   LOCK
+══════════════════════════════════════ */
+function unlockSystem() {
+  const pin = document.getElementById('lockPin').value;
+  if (Pin.check(pin)) {
+    document.getElementById('lockScreen').style.display='none';
+  } else {
+    document.getElementById('lockMsg').innerText='✕ Incorrect PIN';
+    document.getElementById('lockPin').value='';
+    document.getElementById('lockPin').focus();
+  }
+}
+document.getElementById('lockPin').addEventListener('keydown', e=>{ if(e.key==='Enter') unlockSystem(); });
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+function goNav(page, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(page+'-page').classList.add('on');
   btn.classList.add('active');
-  if(p==='records'){ renderStats(); renderTable(); }
+  if (page==='customers') { renderStats(); renderCustomers(); }
+  if (page==='recharges') renderRechargeTable();
 }
 
-let curBox='';
+/* ══════════════════════════════════════
+   REGISTER
+══════════════════════════════════════ */
+function registerCustomer() {
+  const name  = document.getElementById('rname').value.trim();
+  const phone = document.getElementById('rphone').value.trim();
+  const box   = document.getElementById('rbox').value.trim();
+  const amount= document.getElementById('ramt').value.trim()||'0';
+  const months= document.getElementById('rmon').value;
+  const note  = document.getElementById('rnote').value.trim();
 
-function doSearch(){
-  const q=$('q').value.trim().toLowerCase();
-  if(!q) return setMsg('fm','Enter a phone number or box number.',false);
-  clrMsg('fm'); $('cust').style.display='none';
-  const b=$('fb'); busy(b,true);
-  setTimeout(()=>{
-    const row=load().find(r=>String(r.phone).toLowerCase()===q||String(r.box).toLowerCase()===q);
-    busy(b,false);
-    if(!row) return setMsg('fm','Customer not found.',false);
-    $('cn').textContent=row.name; $('cb').textContent=row.box;
-    $('cp').textContent=row.phone; $('ca').textContent=row.lastAmt?'₹'+row.lastAmt:'—';
-    $('cd').textContent=row.lastDate||'—'; $('cr').textContent=row.regDate||'—';
-    curBox=row.box; $('cust').style.display='block';
-    $('ra').value=''; $('rm').selectedIndex=0; clrMsg('rrm');
-  },150);
+  let err=false;
+  if(!name)  { markError('rname',true);  err=true; } else markError('rname',false);
+  if(!phone) { markError('rphone',true); err=true; } else markError('rphone',false);
+  if(!box)   { markError('rbox',true);   err=true; } else markError('rbox',false);
+  if(err) return toast('Fill all required fields','err');
+
+  const db=DB.load();
+  if(db.find(x=>x.phone===phone)) return toast('Phone already registered','err');
+  if(db.find(x=>x.box===box))     return toast('Box already registered','err');
+
+  const start=todayISO(), expiry=addMonths(start,months);
+  db.push({
+    id:Date.now().toString(), name, phone, box,
+    amount:Number(amount), months:Number(months),
+    startDate:start, expiryDate:expiry, boxHistory:[],
+    rechargeHistory:[{ id:uid(), amount:Number(amount), months:Number(months), rechargeDate:start, expiry, note, revoked:false }]
+  });
+  DB.save(db);
+  toast(`${name} registered`,'ok');
+  ['rname','rphone','rbox','ramt','rnote'].forEach(id=>{ document.getElementById(id).value=''; });
 }
 
-function doRecharge(){
-  const amt=$('ra').value.trim(), mon=$('rm').value;
-  if(!amt) return setMsg('rrm','Enter recharge amount.',false);
-  if(!curBox) return setMsg('rrm','No customer loaded.',false);
-  const b=$('rb'); busy(b,true);
-  setTimeout(()=>{
-    const db=load(), i=db.findIndex(r=>r.box===curBox);
-    if(i===-1){ busy(b,false); return setMsg('rrm','Customer not found in DB.',false); }
-    db[i].lastAmt=amt; db[i].months=mon; db[i].lastDate=today();
-    save(db); busy(b,false);
-    setMsg('rrm',`Recharge of ₹${amt} for ${mon} month(s) saved!`,true);
-    $('ca').textContent='₹'+amt; $('cd').textContent=db[i].lastDate;
-  },150);
+/* ══════════════════════════════════════
+   SEARCH
+══════════════════════════════════════ */
+function searchCustomer() {
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  if(!q) return toast('Enter phone or box number','err');
+  const db=DB.load();
+  const c=db.find(x=>x.phone.toLowerCase()===q||x.box.toLowerCase()===q);
+  if(!c){ document.getElementById('customerCard').style.display='none'; currentCustomer=null; return toast('Customer not found','err'); }
+  currentCustomer=c; renderCustomerCard(c); toast('Customer found','ok');
 }
 
-function doRegister(){
-  const name=$('rn').value.trim(), phone=$('rph').value.trim(),
-        box=$('rbx').value.trim(), amt=$('ramt').value.trim();
-  if(!name) return setMsg('rgm','Name is required.',false);
-  if(!phone) return setMsg('rgm','Phone is required.',false);
-  if(!box) return setMsg('rgm','Box Number is required.',false);
-  const b=$('rgbtn'); busy(b,true);
-  setTimeout(()=>{
-    const db=load();
-    if(db.find(r=>r.box.toLowerCase()===box.toLowerCase())){ busy(b,false); return setMsg('rgm','Box number already registered.',false); }
-    if(db.find(r=>String(r.phone)===phone)){ busy(b,false); return setMsg('rgm','Phone already registered.',false); }
-    db.push({name,phone,box,lastAmt:amt||'0',lastDate:today(),regDate:today(),months:'1'});
-    save(db); busy(b,false);
-    setMsg('rgm','Customer registered successfully!',true);
-    ['rn','rph','rbx','ramt'].forEach(id=>$(id).value='');
-  },150);
+function renderCustomerCard(c) {
+  document.getElementById('customerCard').style.display='block';
+  document.getElementById('cname').innerText  = c.name;
+  document.getElementById('cphone').innerText = c.phone;
+  document.getElementById('cbox').innerText   = c.box;
+  document.getElementById('cexp').innerText   = formatDate(c.expiryDate);
+  const active=isActive(c), soon=isExpiringSoon(c);
+  const badge=document.getElementById('statusBadge');
+  const warn=document.getElementById('expiryWarnBanner');
+  if(!active)   { badge.className='badge badge-red';   badge.innerText='✕ Expired'; }
+  else if(soon) { badge.className='badge badge-amber'; badge.innerText=`⚠ ${daysUntil(c.expiryDate)}d left`; }
+  else          { badge.className='badge badge-green'; badge.innerText='● Active'; }
+  warn.style.display=soon?'flex':'none';
+  if(soon) warn.innerText=`⚠ Expires in ${daysUntil(c.expiryDate)} day(s) — consider renewing.`;
+  const activeR=(c.rechargeHistory||[]).filter(h=>!h.revoked);
+  document.getElementById('revokeBtn').style.display=activeR.length>1?'inline-flex':'none';
+}
+
+function clearSearch() {
+  currentCustomer=null;
+  document.getElementById('customerCard').style.display='none';
+  document.getElementById('searchInput').value='';
+  ['ramount','rechargePin','rechargeNote'].forEach(id=>{ document.getElementById(id).value=''; });
+}
+
+/* ══════════════════════════════════════
+   RECHARGE
+══════════════════════════════════════ */
+function submitRecharge() {
+  if(!currentCustomer) return;
+  if(!Pin.check(document.getElementById('rechargePin').value)) return toast('Wrong admin PIN','err');
+  const amount=document.getElementById('ramount').value.trim();
+  const months=Number(document.getElementById('rmonths').value);
+  const note  =document.getElementById('rechargeNote').value.trim();
+  if(!amount||isNaN(Number(amount))||Number(amount)<=0){ markError('ramount',true); return toast('Enter valid amount','err'); }
+  markError('ramount',false);
+
+  let db=DB.load();
+  const idx=db.findIndex(x=>x.box===currentCustomer.box);
+  if(idx===-1) return toast('Customer not found','err');
+
+  const today=new Date(todayISO()), curExp=new Date(db[idx].expiryDate);
+  const start=curExp>=today?db[idx].expiryDate:todayISO();
+  const newExpiry=addMonths(start,months);
+
+  db[idx].amount=Number(amount); db[idx].months=months;
+  db[idx].startDate=start; db[idx].expiryDate=newExpiry;
+  if(!db[idx].rechargeHistory) db[idx].rechargeHistory=[];
+  db[idx].rechargeHistory.push({ id:uid(), amount:Number(amount), months, rechargeDate:todayISO(), expiry:newExpiry, note, revoked:false });
+
+  DB.save(db); currentCustomer=db[idx]; renderCustomerCard(db[idx]);
+  document.getElementById('rechargePin').value='';
+  document.getElementById('ramount').value='';
+  document.getElementById('rechargeNote').value='';
+  toast(`Recharged till ${formatDate(newExpiry)}`,'ok');
+}
+
+/* ══════════════════════════════════════
+   REVOKE RECHARGE
+══════════════════════════════════════ */
+function openRevokeModal() {
+  if(!currentCustomer) return;
+  const db=DB.load();
+  const c=db.find(x=>x.box===currentCustomer.box);
+  const activeH=(c.rechargeHistory||[]).filter(h=>!h.revoked);
+  if(activeH.length<=1) return toast('Cannot revoke — only one recharge on record','err');
+  const last=activeH[activeH.length-1];
+  document.getElementById('revokeInfo').innerHTML=
+    `<strong>Last Recharge:</strong> ₹${last.amount} &nbsp;|&nbsp; ${last.months} month(s) &nbsp;|&nbsp; ${formatDate(last.rechargeDate)}<br>
+     <strong>Valid Till:</strong> ${formatDate(last.expiry)}`;
+  document.getElementById('revokeReason').value='';
+  document.getElementById('revokePin').value='';
+  openModal('revokeModal');
+}
+
+function confirmRevoke() {
+  const reason=document.getElementById('revokeReason').value.trim();
+  const pin=document.getElementById('revokePin').value;
+  if(!Pin.check(pin))  return toast('Wrong admin PIN','err');
+  if(!reason)          return toast('Enter a reason','err');
+  let db=DB.load();
+  const idx=db.findIndex(x=>x.box===currentCustomer.box);
+  if(idx===-1) return;
+  const activeH=db[idx].rechargeHistory.filter(h=>!h.revoked);
+  if(activeH.length<=1) return toast('Nothing to revoke','err');
+  const last=activeH[activeH.length-1];
+  const hi=db[idx].rechargeHistory.findIndex(h=>h.id===last.id);
+  db[idx].rechargeHistory[hi].revoked=true;
+  db[idx].rechargeHistory[hi].revokeReason=reason;
+  db[idx].rechargeHistory[hi].revokeDate=todayISO();
+  const remaining=db[idx].rechargeHistory.filter(h=>!h.revoked);
+  const prev=remaining[remaining.length-1];
+  db[idx].expiryDate=prev.expiry; db[idx].amount=prev.amount; db[idx].months=prev.months;
+  DB.save(db); currentCustomer=db[idx]; renderCustomerCard(db[idx]);
+  closeModal('revokeModal'); toast('Recharge revoked — expiry restored','ok');
+}
+
+/* ══════════════════════════════════════
+   BOX CHANGE
+══════════════════════════════════════ */
+function openBoxChange() {
+  if(!currentCustomer) return;
+  document.getElementById('oldBoxDisplay').value=currentCustomer.box;
+  ['newBoxNumber','boxChangeNote','boxChangePin'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('boxChangeReason').value='';
+  const history=currentCustomer.boxHistory||[];
+  const hs=document.getElementById('boxHistorySection');
+  const hl=document.getElementById('boxHistoryList');
+  if(history.length){
+    hs.style.display='block';
+    hl.innerHTML=history.map(h=>`
+      <div class="boxHistoryItem">
+        <div class="boxHistoryDot"></div>
+        <div><strong>${esc(h.oldBox)}</strong> → <strong>${esc(h.newBox)}</strong>
+        <div style="color:var(--muted);font-size:.78rem">${esc(h.reason)} · ${formatDate(h.date)}${h.note?' · '+esc(h.note):''}</div></div>
+      </div>`).join('');
+  } else { hs.style.display='none'; }
+  openModal('boxChangeModal');
+}
+
+function confirmBoxChange() {
+  const newBox=document.getElementById('newBoxNumber').value.trim();
+  const reason=document.getElementById('boxChangeReason').value;
+  const note=document.getElementById('boxChangeNote').value.trim();
+  const pin=document.getElementById('boxChangePin').value;
+  if(!newBox)  return toast('Enter new box number','err');
+  if(!reason)  return toast('Select a reason','err');
+  if(!Pin.check(pin)) return toast('Wrong admin PIN','err');
+  let db=DB.load();
+  if(db.find(x=>x.box===newBox&&x.box!==currentCustomer.box)) return toast('Box already assigned to another customer','err');
+  const idx=db.findIndex(x=>x.box===currentCustomer.box);
+  if(idx===-1) return;
+  const oldBox=db[idx].box;
+  if(!db[idx].boxHistory) db[idx].boxHistory=[];
+  db[idx].boxHistory.push({ oldBox, newBox, reason, note, date:todayISO() });
+  db[idx].box=newBox;
+  DB.save(db); currentCustomer=db[idx];
+  document.getElementById('cbox').innerText=newBox;
+  document.getElementById('searchInput').value='';
+  closeModal('boxChangeModal');
+  toast(`Box changed: ${oldBox} → ${newBox}`,'ok');
+}
+
+/* ══════════════════════════════════════
+   CUSTOMERS DASHBOARD
+══════════════════════════════════════ */
+function setFilter(f,btn){
+  customerFilter=f;
+  document.querySelectorAll('#filterTabs .sectionTab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderCustomers();
+}
+
+function renderCustomers(){
+  const db=DB.load();
+  const q=document.getElementById('customerSearch').value.toLowerCase();
+  let list=db.filter(c=>c.name.toLowerCase().includes(q)||c.phone.toLowerCase().includes(q)||c.box.toLowerCase().includes(q));
+  if(customerFilter==='active')       list=list.filter(c=>isActive(c)&&!isExpiringSoon(c));
+  if(customerFilter==='expired')      list=list.filter(c=>!isActive(c));
+  if(customerFilter==='expiringSoon') list=list.filter(c=>isExpiringSoon(c));
+  const tbody=document.getElementById('customersBody');
+  if(!list.length){ tbody.innerHTML=`<tr class="emptyRow"><td colspan="7">No customers found</td></tr>`; return; }
+  tbody.innerHTML=list.map((c,i)=>{
+    const active=isActive(c), soon=isExpiringSoon(c);
+    const bh=!active?`<span class="badge badge-red">Expired</span>`:soon?`<span class="badge badge-amber">Expiring Soon</span>`:`<span class="badge badge-green">Active</span>`;
+    const boxBadge=(c.boxHistory||[]).length?`<span class="badge badge-blue" title="Box replaced ${c.boxHistory.length}×" style="margin-left:.3rem;font-size:.65rem">📦×${c.boxHistory.length}</span>`:'';
+    return `<tr>
+      <td style="color:var(--muted2)">${i+1}</td>
+      <td><strong>${esc(c.name)}</strong></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.82rem">${esc(c.phone)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.82rem">${esc(c.box)}${boxBadge}</td>
+      <td>${formatDate(c.expiryDate)}</td>
+      <td>${bh}</td>
+      <td><div style="display:flex;gap:.3rem">
+        <button class="btn btn-ghost btn-sm" onclick="openEdit('${esc(c.box)}')">✏</button>
+        <button class="btn btn-danger btn-sm" onclick="openDelete('${esc(c.box)}','${esc(c.name)}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
 }
 
 function renderStats(){
-  const db=load();
-  const rev=db.reduce((s,r)=>s+Number(r.lastAmt||0),0);
-  const r30=db.filter(r=>{
-    if(!r.lastDate) return false;
-    const p=r.lastDate.split('/');
-    if(p.length<3) return false;
-    return (Date.now()-new Date(p[2],p[1]-1,p[0]))< 30*864e5;
-  }).length;
-  $('statsbar').innerHTML=`
-    <div class="stat"><div class="sn">${db.length}</div><div class="sl">Customers</div></div>
-    <div class="stat"><div class="sn">${r30}</div><div class="sl">Recharged (30d)</div></div>
-    <div class="stat"><div class="sn">₹${rev.toLocaleString('en-IN')}</div><div class="sl">Total Revenue</div></div>`;
+  const db=DB.load();
+  const active=db.filter(c=>isActive(c)).length;
+  const revenue=db.reduce((s,c)=>s+(c.rechargeHistory||[]).filter(h=>!h.revoked).reduce((ss,h)=>ss+Number(h.amount||0),0),0);
+  document.getElementById('statsBar').innerHTML=`
+    <div class="stat"><div class="statNum">${db.length}</div><div class="statLabel">Total Customers</div></div>
+    <div class="stat green"><div class="statNum">${active}</div><div class="statLabel">Active</div></div>
+    <div class="stat amber"><div class="statNum">${db.length-active}</div><div class="statLabel">Expired</div></div>
+    <div class="stat blue"><div class="statNum">₹${revenue.toLocaleString('en-IN')}</div><div class="statLabel">Total Revenue</div></div>`;
 }
 
-function renderTable(){
-  const db=load(), q=($('tsearch').value||'').toLowerCase();
-  const rows=q?db.filter(r=>r.name.toLowerCase().includes(q)||String(r.phone).includes(q)||r.box.toLowerCase().includes(q)):db;
-  const body=$('tbody');
-  if(!rows.length){ body.innerHTML=`<tr class="er"><td colspan="7">No customers found</td></tr>`; return; }
-  body.innerHTML=rows.map((r,i)=>`
-    <tr>
-      <td style="color:var(--muted);font-size:.8rem">${i+1}</td>
-      <td><strong>${esc(r.name)}</strong></td>
-      <td style="font-size:.85rem">${esc(r.phone)}</td>
-      <td style="font-family:monospace;font-size:.85rem">${esc(r.box)}</td>
-      <td><span class="badge">₹${esc(r.lastAmt||0)}</span></td>
-      <td style="font-size:.82rem;color:var(--muted)">${esc(r.lastDate||'—')}</td>
-      <td><button class="xb" onclick="delCust('${esc(r.box)}')">✕</button></td>
+/* ══════════════════════════════════════
+   RECHARGE TABLE
+══════════════════════════════════════ */
+function renderRechargeTable(){
+  const db=DB.load();
+  const q=document.getElementById('rechargeSearch').value.toLowerCase();
+  let rows=[];
+  db.forEach(c=>{
+    if(!c.name.toLowerCase().includes(q)&&!c.phone.toLowerCase().includes(q)&&!c.box.toLowerCase().includes(q)) return;
+    (c.rechargeHistory||[]).forEach(h=>rows.push({c,h}));
+  });
+  rows.sort((a,b)=>b.h.rechargeDate.localeCompare(a.h.rechargeDate));
+  const tbody=document.getElementById('rechargeBody');
+  if(!rows.length){ tbody.innerHTML=`<tr class="emptyRow"><td colspan="9">No recharges found</td></tr>`; return; }
+  tbody.innerHTML=rows.map(({c,h},i)=>`
+    <tr${h.revoked?' class="revoked"':''}>
+      <td style="color:var(--muted2)">${i+1}</td>
+      <td><strong>${esc(c.name)}</strong></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.82rem">${esc(c.box)}</td>
+      <td style="font-weight:700;color:${h.revoked?'var(--muted)':'var(--green)'}">₹${Number(h.amount).toLocaleString('en-IN')}</td>
+      <td>${h.months} mo.</td>
+      <td>${formatDate(h.rechargeDate)}</td>
+      <td>${formatDate(h.expiry)}</td>
+      <td>${h.note?`<span class="noteChip" title="${esc(h.note)}">${esc(h.note)}</span>`:'—'}</td>
+      <td>${h.revoked?`<span class="badge badge-red" title="${esc(h.revokeReason||'')}">Revoked</span>`:`<span class="badge badge-green">Active</span>`}</td>
     </tr>`).join('');
 }
 
-function delCust(box){
-  if(!confirm(`Delete customer with Box: ${box}?`)) return;
-  save(load().filter(r=>r.box!==box));
-  renderStats(); renderTable();
+/* ══════════════════════════════════════
+   EDIT / DELETE
+══════════════════════════════════════ */
+function openEdit(box){
+  const c=DB.load().find(x=>x.box===box); if(!c) return;
+  document.getElementById('editBox').value=box;
+  document.getElementById('editName').value=c.name;
+  document.getElementById('editPhone').value=c.phone;
+  openModal('editModal');
+}
+function saveEdit(){
+  const box=document.getElementById('editBox').value;
+  const name=document.getElementById('editName').value.trim();
+  const phone=document.getElementById('editPhone').value.trim();
+  if(!name||!phone) return toast('All fields required','err');
+  let db=DB.load(); const idx=db.findIndex(x=>x.box===box); if(idx===-1) return;
+  if(db.find((x,i)=>i!==idx&&x.phone===phone)) return toast('Phone already in use','err');
+  db[idx].name=name; db[idx].phone=phone;
+  DB.save(db); closeModal('editModal'); toast('Customer updated','ok'); renderCustomers();
+}
+function openDelete(box,name){
+  pendingDeleteBox=box;
+  document.getElementById('deleteCustomerName').innerText=name;
+  document.getElementById('deletePin').value='';
+  openModal('deleteModal');
+}
+function confirmDelete(){
+  if(!Pin.check(document.getElementById('deletePin').value)) return toast('Wrong admin PIN','err');
+  DB.save(DB.load().filter(x=>x.box!==pendingDeleteBox));
+  closeModal('deleteModal'); toast('Customer deleted','ok'); renderCustomers(); renderStats();
 }
 
-function exportCSV(){
-  const db=load();
-  if(!db.length) return alert('No data to export.');
-  const h='Name,Phone,Box No,Last Amount,Last Date,Reg Date\n';
-  const rows=db.map(r=>`"${r.name}","${r.phone}","${r.box}","${r.lastAmt}","${r.lastDate}","${r.regDate}"`).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([h+rows],{type:'text/csv'}));
-  a.download='ankita_customers_'+new Date().toISOString().slice(0,10)+'.csv';
-  a.click();
+/* ══════════════════════════════════════
+   ADMIN PIN
+══════════════════════════════════════ */
+function changeAdminPin(){
+  const o=document.getElementById('oldPin').value;
+  const n=document.getElementById('newPin').value;
+  const c=document.getElementById('confirmPin').value;
+  if(!Pin.check(o)) return toast('Current PIN incorrect','err');
+  if(n.length<4)    return toast('PIN min 4 digits','err');
+  if(n!==c)         return toast('PINs do not match','err');
+  Pin.set(n); toast('PIN changed','ok'); closeModal('adminPanel');
+  ['oldPin','newPin','confirmPin'].forEach(id=>{ document.getElementById(id).value=''; });
 }
+
+/* ══════════════════════════════════════
+   EXPORT CSV
+══════════════════════════════════════ */
+function exportCSV(){
+  const db=DB.load(); if(!db.length) return toast('No data to export','err');
+  const headers=['Name','Phone','Box','Expiry','Status','Box Changes'];
+  const rows=db.map(c=>[`"${c.name}"`,c.phone,c.box,c.expiryDate,isActive(c)?'Active':'Expired',(c.boxHistory||[]).length]);
+  const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`ankita-cable-${todayISO()}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('CSV exported','ok');
+}
+
+/* ══════════════════════════════════════
+   MODAL HELPERS
+══════════════════════════════════════ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modalBg').forEach(bg=>{
+  bg.addEventListener('click',e=>{ if(e.target===bg) closeModal(bg.id); });
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.modalBg.open').forEach(m=>closeModal(m.id));
+});
 </script>
+  
+  <script>
+/* ══════════════════════════════════════
+   CONSTANTS
+══════════════════════════════════════ */
+const STORAGE_KEY  = 'ankitaCableDB';
+const PIN_KEY      = 'ankitaAdminPin';
+const DRIVE_FILE   = 'ankita-cable-backup.json';
+
+const CLIENT_ID =
+'116734775725-aag2eetv2ul6olt14s5tft2u0nb58et5.apps.googleusercontent.com';
+
+const SCOPES =
+'https://www.googleapis.com/auth/drive.file';
+
+if (!localStorage.getItem(PIN_KEY)) {
+  localStorage.setItem(PIN_KEY, '1234');
+}
+
+let driveToken  = localStorage.getItem('ankitaDriveToken') || null;
+let driveFileId = localStorage.getItem('ankitaDriveFileId') || null;
+
+let tokenClient;
+
+/* ══════════════════════════════════════
+   DATABASE
+══════════════════════════════════════ */
+const DB = {
+  load() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  },
+
+  save(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+};
+
+/* ══════════════════════════════════════
+   PIN
+══════════════════════════════════════ */
+const Pin = {
+  get() {
+    return localStorage.getItem(PIN_KEY);
+  },
+
+  set(v) {
+    localStorage.setItem(PIN_KEY, v);
+  },
+
+  check(v) {
+    return v === this.get();
+  }
+};
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function toast(msg, type='ok') {
+
+  const wrap = document.getElementById('toastContainer');
+
+  const div = document.createElement('div');
+
+  div.className = `toast toast-${type}`;
+
+  div.innerHTML = `
+    <span>
+      ${
+        type === 'ok'
+          ? '✔'
+          : type === 'err'
+          ? '✕'
+          : 'ℹ'
+      }
+    </span>
+    ${msg}
+  `;
+
+  wrap.appendChild(div);
+
+  setTimeout(() => {
+
+    div.style.animation =
+      'toastOut .3s ease forwards';
+
+    setTimeout(() => {
+      div.remove();
+    }, 300);
+
+  }, 3500);
+}
+
+/* ══════════════════════════════════════
+   DATE HELPERS
+══════════════════════════════════════ */
+function todayISO() {
+  return new Date()
+    .toISOString()
+    .slice(0,10);
+}
+
+/* ══════════════════════════════════════
+   GOOGLE AUTH INIT
+══════════════════════════════════════ */
+function initGoogleAuth() {
+
+  if (typeof google === 'undefined') {
+
+    setTimeout(initGoogleAuth, 500);
+
+    return;
+  }
+
+  tokenClient =
+    google.accounts.oauth2.initTokenClient({
+
+      client_id: CLIENT_ID,
+
+      scope: SCOPES,
+
+      callback: async (resp) => {
+
+        if (resp.error) {
+
+          toast(
+            'Google sign in failed',
+            'err'
+          );
+
+          return;
+        }
+
+        driveToken = resp.access_token;
+
+        localStorage.setItem(
+          'ankitaDriveToken',
+          driveToken
+        );
+
+        await validateDriveLogin();
+
+        toast(
+          'Google Drive connected',
+          'ok'
+        );
+      }
+    });
+
+  updateDriveStatus();
+
+  autoRestoreSession();
+}
+
+/* ══════════════════════════════════════
+   AUTO SESSION RESTORE
+══════════════════════════════════════ */
+async function autoRestoreSession() {
+
+  if (!driveToken) return;
+
+  try {
+
+    const res = await fetch(
+      'https://www.googleapis.com/drive/v3/about?fields=user',
+      {
+        headers: {
+          Authorization:
+          `Bearer ${driveToken}`
+        }
+      }
+    );
+
+    if (res.ok) {
+
+      updateDriveStatus();
+
+    } else {
+
+      clearDriveSession();
+    }
+
+  } catch {
+
+    clearDriveSession();
+  }
+}
+
+/* ══════════════════════════════════════
+   VALIDATE LOGIN
+══════════════════════════════════════ */
+async function validateDriveLogin() {
+
+  try {
+
+    const res = await fetch(
+      'https://www.googleapis.com/drive/v3/about?fields=user',
+      {
+        headers: {
+          Authorization:
+          `Bearer ${driveToken}`
+        }
+      }
+    );
+
+    if (res.ok) {
+
+      updateDriveStatus();
+
+    } else {
+
+      clearDriveSession();
+    }
+
+  } catch {
+
+    clearDriveSession();
+  }
+}
+
+/* ══════════════════════════════════════
+   CLEAR SESSION
+══════════════════════════════════════ */
+function clearDriveSession() {
+
+  driveToken = null;
+
+  driveFileId = null;
+
+  localStorage.removeItem(
+    'ankitaDriveToken'
+  );
+
+  localStorage.removeItem(
+    'ankitaDriveFileId'
+  );
+
+  updateDriveStatus();
+}
+
+/* ══════════════════════════════════════
+   SIGN IN
+══════════════════════════════════════ */
+function driveSignIn() {
+
+  if (!tokenClient) {
+
+    toast(
+      'Google library loading...',
+      'info'
+    );
+
+    return;
+  }
+
+  tokenClient.requestAccessToken({
+    prompt: 'consent'
+  });
+}
+
+/* ══════════════════════════════════════
+   SIGN OUT
+══════════════════════════════════════ */
+function driveSignOut() {
+
+  if (driveToken) {
+
+    google.accounts.oauth2.revoke(
+      driveToken,
+      () => {}
+    );
+  }
+
+  clearDriveSession();
+
+  toast(
+    'Signed out from Google Drive',
+    'info'
+  );
+}
+
+/* ══════════════════════════════════════
+   UPDATE UI
+══════════════════════════════════════ */
+function updateDriveStatus() {
+
+  const connected = !!driveToken;
+
+  const status =
+    document.getElementById(
+      'driveStatusText'
+    );
+
+  document.getElementById(
+    'driveSignInBtn'
+  ).style.display =
+    connected
+      ? 'none'
+      : 'inline-flex';
+
+  document.getElementById(
+    'driveSignOutBtn'
+  ).style.display =
+    connected
+      ? 'inline-flex'
+      : 'none';
+
+  document.getElementById(
+    'driveBackupBtn'
+  ).style.display =
+    connected
+      ? 'inline-flex'
+      : 'none';
+
+  document.getElementById(
+    'driveRestoreBtn'
+  ).style.display =
+    connected
+      ? 'inline-flex'
+      : 'none';
+
+  if (connected) {
+
+    status.innerHTML =
+      `
+      <span class="driveConnected">
+        ☁ Google Drive connected
+      </span>
+      `;
+
+  } else {
+
+    status.innerHTML =
+      `
+      Google Drive not connected
+      `;
+  }
+}
+
+/* ══════════════════════════════════════
+   FIND DRIVE FILE
+══════════════════════════════════════ */
+async function findDriveFile() {
+
+  if (driveFileId) {
+    return driveFileId;
+  }
+
+  const res = await fetch(
+
+    `https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FILE}' and trashed=false&fields=files(id,name)`,
+
+    {
+      headers: {
+        Authorization:
+        `Bearer ${driveToken}`
+      }
+    }
+  );
+
+  const data = await res.json();
+
+  if (
+    data.files &&
+    data.files.length
+  ) {
+
+    driveFileId =
+      data.files[0].id;
+
+    localStorage.setItem(
+      'ankitaDriveFileId',
+      driveFileId
+    );
+
+    return driveFileId;
+  }
+
+  return null;
+}
+
+/* ══════════════════════════════════════
+   BACKUP
+══════════════════════════════════════ */
+async function driveBackup() {
+
+  if (!driveToken) {
+
+    toast(
+      'Please sign in first',
+      'err'
+    );
+
+    return;
+  }
+
+  const btn =
+    document.getElementById(
+      'driveBackupBtn'
+    );
+
+  btn.disabled = true;
+
+  btn.innerHTML =
+    'Saving...';
+
+  try {
+
+    const payload =
+      JSON.stringify({
+
+        backupDate:
+          new Date().toISOString(),
+
+        appVersion: '2.1',
+
+        customers:
+          DB.load(),
+
+        adminPin:
+          Pin.get()
+
+      }, null, 2);
+
+    const existingId =
+      await findDriveFile();
+
+    let res;
+
+    if (existingId) {
+
+      res = await fetch(
+
+        `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media`,
+
+        {
+          method: 'PATCH',
+
+          headers: {
+
+            Authorization:
+              `Bearer ${driveToken}`,
+
+            'Content-Type':
+              'application/json'
+          },
+
+          body: payload
+        }
+      );
+
+    } else {
+
+      const metadata =
+        new Blob([JSON.stringify({
+
+          name: DRIVE_FILE,
+
+          mimeType:
+            'application/json'
+
+        })], {
+
+          type:
+            'application/json'
+        });
+
+      const file =
+        new Blob([payload], {
+
+          type:
+            'application/json'
+        });
+
+      const form =
+        new FormData();
+
+      form.append(
+        'metadata',
+        metadata
+      );
+
+      form.append(
+        'file',
+        file
+      );
+
+      res = await fetch(
+
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+
+        {
+          method: 'POST',
+
+          headers: {
+            Authorization:
+            `Bearer ${driveToken}`
+          },
+
+          body: form
+        }
+      );
+
+      const created =
+        await res.json();
+
+      driveFileId =
+        created.id;
+
+      localStorage.setItem(
+        'ankitaDriveFileId',
+        driveFileId
+      );
+    }
+
+    if (res.ok) {
+
+      const now =
+        new Date()
+        .toLocaleString('en-IN');
+
+      localStorage.setItem(
+        'ankitaLastBackup',
+        now
+      );
+
+      document.getElementById(
+        'driveLastBackup'
+      ).innerText =
+        `Last backup: ${now}`;
+
+      toast(
+        'Backup saved to Google Drive',
+        'ok'
+      );
+
+    } else {
+
+      toast(
+        'Backup failed',
+        'err'
+      );
+    }
+
+  } catch(e) {
+
+    toast(
+      e.message,
+      'err'
+    );
+  }
+
+  btn.disabled = false;
+
+  btn.innerHTML =
+    '☁ Backup';
+}
+
+/* ══════════════════════════════════════
+   RESTORE
+══════════════════════════════════════ */
+async function driveRestore() {
+
+  if (!driveToken) {
+
+    toast(
+      'Please sign in first',
+      'err'
+    );
+
+    return;
+  }
+
+  const ok =
+    confirm(
+      'Replace all local data from Google Drive backup?'
+    );
+
+  if (!ok) return;
+
+  const btn =
+    document.getElementById(
+      'driveRestoreBtn'
+    );
+
+  btn.disabled = true;
+
+  btn.innerHTML =
+    'Restoring...';
+
+  try {
+
+    const fileId =
+      await findDriveFile();
+
+    if (!fileId) {
+
+      toast(
+        'No backup found',
+        'err'
+      );
+
+      btn.disabled = false;
+
+      btn.innerHTML =
+        '☁ Restore';
+
+      return;
+    }
+
+    const res = await fetch(
+
+      `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+
+      {
+        headers: {
+          Authorization:
+          `Bearer ${driveToken}`
+        }
+      }
+    );
+
+    if (!res.ok) {
+
+      toast(
+        'Restore failed',
+        'err'
+      );
+
+      return;
+    }
+
+    const data =
+      await res.json();
+
+    if (!data.customers) {
+
+      toast(
+        'Invalid backup',
+        'err'
+      );
+
+      return;
+    }
+
+    DB.save(
+      data.customers
+    );
+
+    if (data.adminPin) {
+
+      Pin.set(
+        data.adminPin
+      );
+    }
+
+    toast(
+      `Restored ${data.customers.length} customers`,
+      'ok'
+    );
+
+    location.reload();
+
+  } catch(e) {
+
+    toast(
+      e.message,
+      'err'
+    );
+  }
+
+  btn.disabled = false;
+
+  btn.innerHTML =
+    '☁ Restore';
+}
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+window.addEventListener(
+  'load',
+  initGoogleAuth
+);
+</script>
+  
+  
+  
+  
 </body>
 </html>
