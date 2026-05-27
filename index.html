@@ -185,6 +185,22 @@ tr:hover td{background:var(--surface2)}
 .boxHistoryDot{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:.35rem;flex-shrink:0}
 .revoked{opacity:.55;text-decoration:line-through}
 
+/* RECHARGE TIMELINE */
+.timeline{position:relative;padding-left:1.5rem}
+.timeline::before{content:'';position:absolute;left:.3rem;top:0;bottom:0;width:2px;background:var(--border2)}
+.tlItem{position:relative;margin-bottom:1rem}
+.tlItem:last-child{margin-bottom:0}
+.tlDot{position:absolute;left:-1.35rem;top:.3rem;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.tlDot.revoked{background:var(--red)}
+.tlCard{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem}
+.tlCard.revoked-card{background:var(--red-bg);border-color:#f0c0c0;opacity:.75}
+.tlTop{display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;flex-wrap:wrap}
+.tlMonth{font-family:'Teko',sans-serif;font-size:1.05rem;font-weight:600}
+.tlAmount{font-weight:700;color:var(--green);margin-left:auto}
+.tlAmount.revoked{color:var(--red);text-decoration:line-through}
+.tlMeta{font-size:.78rem;color:var(--muted);display:flex;gap:1rem;flex-wrap:wrap}
+.tlNote{font-size:.78rem;color:var(--blue);margin-top:.3rem;font-style:italic}
+
 /* DRIVE STATUS BAR */
 #driveStatusBar{background:var(--nav);border-top:1px solid rgba(255,255,255,.08);padding:.4rem 1.5rem;display:flex;align-items:center;gap:.75rem;font-size:.75rem;color:#8a9ab0}
 #driveStatusBar .dsIcon{font-size:.9rem}
@@ -245,9 +261,9 @@ tr:hover td{background:var(--surface2)}
     <button class="btn btn-ghost" onclick="exportCSV()" style="color:#aaa;border-color:#444">↓ CSV</button>
     <button class="btn btn-purple" id="driveBackupBtn" onclick="driveBackup()" style="display:none">☁ Backup</button>
     <button class="btn btn-blue" id="driveRestoreBtn" onclick="driveRestore()" style="display:none">☁ Restore</button>
-    <button class="btn" id="driveSignInBtn" onclick="driveSignIn()" style="background:#4285f4;color:#fff;display:none">
+    <button class="btn" id="driveSignInBtn" onclick="driveSignIn()" style="background:#4285f4;color:#fff;">
       <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#fff" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5c10.8 0 19.5-8.7 19.5-19.5 0-1.2-.1-2.3-.4-3.5z"/></svg>
-      Sign in
+      Sign in with Google
     </button>
     <button class="btn btn-ghost" id="driveSignOutBtn" onclick="driveSignOut()" style="color:#aaa;border-color:#444;display:none">Sign Out</button>
     <button class="btn btn-primary" onclick="openModal('adminPanel')">⚙ Admin</button>
@@ -376,7 +392,7 @@ tr:hover td{background:var(--surface2)}
     </div>
     <div class="tableWrap">
       <table>
-        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Box</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Box</th><th>Expiry</th><th>Status</th><th>History</th><th>Actions</th></tr></thead>
         <tbody id="customersBody"></tbody>
       </table>
     </div>
@@ -420,6 +436,7 @@ tr:hover td{background:var(--surface2)}
     <input type="hidden" id="editBox">
     <div class="field"><label>Full Name</label><input id="editName"></div>
     <div class="field"><label>Phone Number</label><input id="editPhone" maxlength="10"></div>
+    <div class="field"><label>Expiry Date</label><input type="date" id="editExpiry"></div>
     <div class="modalActions">
       <button class="btn btn-ghost" onclick="closeModal('editModal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
@@ -486,6 +503,18 @@ tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
+<!-- ══ MODAL: RECHARGE HISTORY ══ -->
+<div class="modalBg" id="historyModal">
+  <div class="modal" style="max-width:560px">
+    <h2>📋 Recharge History</h2>
+    <div id="historyCustomerInfo" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;margin-bottom:1.25rem;display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.88rem"></div>
+    <div id="historyTimeline"></div>
+    <div class="modalActions">
+      <button class="btn btn-ghost btn-full" onclick="closeModal('historyModal')">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ MODAL: GOOGLE DRIVE SETUP ══ -->
 <div class="modalBg" id="driveSetupModal">
   <div class="modal" style="max-width:520px">
@@ -543,7 +572,8 @@ let customerFilter  = 'all';
 let pendingDeleteBox= null;
 let currentCustomer = null;
 let driveToken      = null;
-let driveFileId     = null; // cached Drive file ID
+let driveFileId     = null;
+let backupAllowed   = false; // true only after restore or when local data exists
 
 /* ── DB ── */
 const DB = {
@@ -625,9 +655,49 @@ function driveSignOut() {
   toast('Signed out from Google Drive','info');
 }
 
-function onDriveSignedIn() {
+async function onDriveSignedIn() {
   updateDriveStatus();
-  toast('Google Drive connected ✔','ok');
+  const localData = DB.load();
+  if (localData.length > 0) {
+    // Local data exists — this is an existing device, backup is safe
+    backupAllowed = true;
+    toast('Google Drive connected ✔ — local data found, backup enabled','ok');
+    updateDriveStatus();
+  } else {
+    // Fresh device — must restore first before any backup
+    backupAllowed = false;
+    toast('Google Drive connected — restoring data from Drive…','info');
+    await driveRestore(true);
+  }
+}
+
+// Called after every vital action
+async function silentBackup() {
+  if (!driveToken) return;
+  if (!backupAllowed) return; // safety: never backup an empty fresh instance
+  try {
+    const payload = JSON.stringify({ backupDate: new Date().toISOString(), appVersion:'2.0', customers: DB.load(), adminPin: Pin.get() }, null, 2);
+    const existingId = await findDriveFile();
+    let res;
+    if (existingId) {
+      res = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media`, {
+        method:'PATCH', headers:{ Authorization:`Bearer ${driveToken}`, 'Content-Type':'application/json' }, body: payload
+      });
+    } else {
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify({ name: DRIVE_FILE, mimeType:'application/json' })], { type:'application/json' }));
+      form.append('file', new Blob([payload], { type:'application/json' }));
+      res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method:'POST', headers:{ Authorization:`Bearer ${driveToken}` }, body: form
+      });
+      if (res.ok) { const d=await res.json(); driveFileId=d.id; }
+    }
+    if (res.ok) {
+      const now = new Date().toLocaleString('en-IN');
+      localStorage.setItem('ankitaLastBackup', now);
+      document.getElementById('driveLastBackup').innerText = `Last backup: ${now}`;
+    }
+  } catch(e) { /* silent — don't bother user */ }
 }
 
 function updateDriveStatus() {
@@ -640,6 +710,16 @@ function updateDriveStatus() {
   document.getElementById('driveSignOutBtn').style.display  = connected ? 'inline-flex' : 'none';
   document.getElementById('driveBackupBtn').style.display   = connected ? 'inline-flex' : 'none';
   document.getElementById('driveRestoreBtn').style.display  = connected ? 'inline-flex' : 'none';
+
+  // Gray out backup if not yet allowed (fresh device, restore not done)
+  const backupBtn = document.getElementById('driveBackupBtn');
+  if (connected && !backupAllowed) {
+    backupBtn.style.opacity = '0.4';
+    backupBtn.title = 'Restore from Drive first before backing up';
+  } else {
+    backupBtn.style.opacity = '1';
+    backupBtn.title = '';
+  }
 
   if (connected) {
     statusText.innerHTML = `<span class="driveConnected">☁ Google Drive connected</span>`;
@@ -672,6 +752,7 @@ async function findDriveFile() {
 /* ── BACKUP TO DRIVE ── */
 async function driveBackup() {
   if (!driveToken) { toast('Sign in to Google Drive first','err'); return; }
+  if (!backupAllowed) { toast('Please restore from Drive first before backing up on a new device','err'); return; }
   const btn = document.getElementById('driveBackupBtn');
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span> Saving…`;
@@ -730,13 +811,12 @@ async function driveBackup() {
 }
 
 /* ── RESTORE FROM DRIVE ── */
-async function driveRestore() {
+async function driveRestore(silent=false) {
   if (!driveToken) { toast('Sign in to Google Drive first','err'); return; }
-  if (!confirm('This will REPLACE all local data with the Drive backup.\n\nAre you sure?')) return;
+  if (!silent && !confirm('This will REPLACE all local data with the Drive backup.\n\nAre you sure?')) return;
 
   const btn = document.getElementById('driveRestoreBtn');
-  btn.disabled = true;
-  btn.innerHTML = `<span class="spinner"></span> Restoring…`;
+  if (!silent) { btn.disabled=true; btn.innerHTML=`<span class="spinner"></span> Restoring…`; }
 
   try {
     const fileId = await findDriveFile();
@@ -750,7 +830,7 @@ async function driveRestore() {
       { headers: { Authorization: `Bearer ${driveToken}` } }
     );
 
-    if (!res.ok) { toast('Failed to download backup','err'); btn.disabled=false; btn.innerHTML='☁ Restore'; return; }
+    if (!res.ok) { if(!silent) toast('Failed to download backup','err'); if(!silent){btn.disabled=false;btn.innerHTML='☁ Restore';} return; }
 
     const data = await res.json();
 
@@ -758,15 +838,18 @@ async function driveRestore() {
       DB.save(data.customers);
       if (data.adminPin) Pin.set(data.adminPin);
       const backupDate = data.backupDate ? new Date(data.backupDate).toLocaleString('en-IN') : 'unknown';
-      toast(`Restored ${data.customers.length} customers from backup (${backupDate}) ✔`, 'ok');
+      backupAllowed = true; // restore done — backup is now safe
+      toast(`✔ Restored ${data.customers.length} customers from Drive (${backupDate})`, 'ok');
+      updateDriveStatus();
+      renderCustomers && renderCustomers();
     } else {
-      toast('Backup file format invalid','err');
+      if (!silent) toast('Backup file format invalid','err');
     }
   } catch(e) {
-    toast('Restore error: ' + e.message, 'err');
+    if (!silent) toast('Restore error: ' + e.message, 'err');
   }
 
-  btn.disabled=false; btn.innerHTML='☁ Restore';
+  if (!silent) { btn.disabled=false; btn.innerHTML='☁ Restore'; }
 }
 
 // Init Google Auth when page loads
@@ -830,6 +913,7 @@ function registerCustomer() {
   DB.save(db);
   toast(`${name} registered`,'ok');
   ['rname','rphone','rbox','ramt','rnote'].forEach(id=>{ document.getElementById(id).value=''; });
+  silentBackup();
 }
 
 /* ══════════════════════════════════════
@@ -899,6 +983,7 @@ function submitRecharge() {
   document.getElementById('ramount').value='';
   document.getElementById('rechargeNote').value='';
   toast(`Recharged till ${formatDate(newExpiry)}`,'ok');
+  silentBackup();
 }
 
 /* ══════════════════════════════════════
@@ -938,7 +1023,7 @@ function confirmRevoke() {
   const prev=remaining[remaining.length-1];
   db[idx].expiryDate=prev.expiry; db[idx].amount=prev.amount; db[idx].months=prev.months;
   DB.save(db); currentCustomer=db[idx]; renderCustomerCard(db[idx]);
-  closeModal('revokeModal'); toast('Recharge revoked — expiry restored','ok');
+  closeModal('revokeModal'); toast('Recharge revoked — expiry restored','ok'); silentBackup();
 }
 
 /* ══════════════════════════════════════
@@ -985,6 +1070,7 @@ function confirmBoxChange() {
   document.getElementById('searchInput').value='';
   closeModal('boxChangeModal');
   toast(`Box changed: ${oldBox} → ${newBox}`,'ok');
+  silentBackup();
 }
 
 /* ══════════════════════════════════════
@@ -1004,7 +1090,7 @@ function renderCustomers(){
   if(customerFilter==='expired')      list=list.filter(c=>!isActive(c));
   if(customerFilter==='expiringSoon') list=list.filter(c=>isExpiringSoon(c));
   const tbody=document.getElementById('customersBody');
-  if(!list.length){ tbody.innerHTML=`<tr class="emptyRow"><td colspan="7">No customers found</td></tr>`; return; }
+  if(!list.length){ tbody.innerHTML=`<tr class="emptyRow"><td colspan="8">No customers found</td></tr>`; return; }
   tbody.innerHTML=list.map((c,i)=>{
     const active=isActive(c), soon=isExpiringSoon(c);
     const bh=!active?`<span class="badge badge-red">Expired</span>`:soon?`<span class="badge badge-amber">Expiring Soon</span>`:`<span class="badge badge-green">Active</span>`;
@@ -1017,6 +1103,7 @@ function renderCustomers(){
       <td>${formatDate(c.expiryDate)}</td>
       <td>${bh}</td>
       <td><div style="display:flex;gap:.3rem">
+        <button class="btn btn-ghost btn-sm" onclick="openHistory('${esc(c.box)}')" title="Recharge History">📋</button>
         <button class="btn btn-ghost btn-sm" onclick="openEdit('${esc(c.box)}')">✏</button>
         <button class="btn btn-danger btn-sm" onclick="openDelete('${esc(c.box)}','${esc(c.name)}')">🗑</button>
       </div></td>
@@ -1066,22 +1153,89 @@ function renderRechargeTable(){
 /* ══════════════════════════════════════
    EDIT / DELETE
 ══════════════════════════════════════ */
+/* ══════════════════════════════════════
+   RECHARGE HISTORY MODAL
+══════════════════════════════════════ */
+function openHistory(box) {
+  const c = DB.load().find(x => x.box === box);
+  if (!c) return;
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Customer info strip
+  const active = isActive(c), soon = isExpiringSoon(c);
+  const statusHtml = !active
+    ? `<span class="badge badge-red">Expired</span>`
+    : soon ? `<span class="badge badge-amber">Expiring Soon</span>`
+           : `<span class="badge badge-green">Active</span>`;
+  const totalPaid = (c.rechargeHistory||[]).filter(h=>!h.revoked).reduce((s,h)=>s+Number(h.amount||0),0);
+
+  document.getElementById('historyCustomerInfo').innerHTML = `
+    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem">Customer</div><strong>${esc(c.name)}</strong></div>
+    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem">Box</div><span style="font-family:'JetBrains Mono',monospace">${esc(c.box)}</span></div>
+    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem">Expiry</div>${formatDate(c.expiryDate)}</div>
+    <div><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem">Total Paid</div><strong style="color:var(--green)">₹${totalPaid.toLocaleString('en-IN')}</strong></div>
+    <div style="margin-left:auto;align-self:center">${statusHtml}</div>`;
+
+  // Timeline — newest first
+  const history = [...(c.rechargeHistory || [])].reverse();
+
+  if (!history.length) {
+    document.getElementById('historyTimeline').innerHTML =
+      `<div style="text-align:center;color:var(--muted2);padding:2rem">No recharge history found</div>`;
+  } else {
+    document.getElementById('historyTimeline').innerHTML = `
+      <div class="timeline">
+        ${history.map(h => {
+          const d = new Date(h.rechargeDate);
+          const monthLabel = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+          const isRevoked = h.revoked;
+          return `
+          <div class="tlItem">
+            <div class="tlDot ${isRevoked?'revoked':''}"></div>
+            <div class="tlCard ${isRevoked?'revoked-card':''}">
+              <div class="tlTop">
+                <span class="tlMonth">${monthLabel}</span>
+                ${isRevoked
+                  ? `<span class="badge badge-red" style="font-size:.68rem">Revoked</span>`
+                  : `<span class="badge badge-green" style="font-size:.68rem">✔ Paid</span>`}
+                <span class="tlAmount ${isRevoked?'revoked':''}">₹${Number(h.amount).toLocaleString('en-IN')}</span>
+              </div>
+              <div class="tlMeta">
+                <span>📅 Recharged: ${formatDate(h.rechargeDate)}</span>
+                <span>⏱ ${h.months} month${h.months>1?'s':''}</span>
+                <span>📆 Valid till: ${formatDate(h.expiry)}</span>
+              </div>
+              ${h.note ? `<div class="tlNote">💬 ${esc(h.note)}</div>` : ''}
+              ${isRevoked && h.revokeReason ? `<div class="tlNote" style="color:var(--red)">✕ Revoke reason: ${esc(h.revokeReason)} (${formatDate(h.revokeDate)})</div>` : ''}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  openModal('historyModal');
+}
+
 function openEdit(box){
   const c=DB.load().find(x=>x.box===box); if(!c) return;
   document.getElementById('editBox').value=box;
   document.getElementById('editName').value=c.name;
   document.getElementById('editPhone').value=c.phone;
+  document.getElementById('editExpiry').value=c.expiryDate||'';
   openModal('editModal');
 }
 function saveEdit(){
   const box=document.getElementById('editBox').value;
   const name=document.getElementById('editName').value.trim();
   const phone=document.getElementById('editPhone').value.trim();
+  const expiry=document.getElementById('editExpiry').value;
   if(!name||!phone) return toast('All fields required','err');
   let db=DB.load(); const idx=db.findIndex(x=>x.box===box); if(idx===-1) return;
   if(db.find((x,i)=>i!==idx&&x.phone===phone)) return toast('Phone already in use','err');
   db[idx].name=name; db[idx].phone=phone;
-  DB.save(db); closeModal('editModal'); toast('Customer updated','ok'); renderCustomers();
+  if(expiry) db[idx].expiryDate=expiry;
+  DB.save(db); closeModal('editModal'); toast('Customer updated','ok'); renderCustomers(); silentBackup();
 }
 function openDelete(box,name){
   pendingDeleteBox=box;
@@ -1092,7 +1246,7 @@ function openDelete(box,name){
 function confirmDelete(){
   if(!Pin.check(document.getElementById('deletePin').value)) return toast('Wrong admin PIN','err');
   DB.save(DB.load().filter(x=>x.box!==pendingDeleteBox));
-  closeModal('deleteModal'); toast('Customer deleted','ok'); renderCustomers(); renderStats();
+  closeModal('deleteModal'); toast('Customer deleted','ok'); renderCustomers(); renderStats(); silentBackup();
 }
 
 /* ══════════════════════════════════════
@@ -1107,6 +1261,7 @@ function changeAdminPin(){
   if(n!==c)         return toast('PINs do not match','err');
   Pin.set(n); toast('PIN changed','ok'); closeModal('adminPanel');
   ['oldPin','newPin','confirmPin'].forEach(id=>{ document.getElementById(id).value=''; });
+  silentBackup();
 }
 
 /* ══════════════════════════════════════
